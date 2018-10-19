@@ -60,13 +60,13 @@ int main(int argc, char *argv[])
 	    {
 	    	fd.write(lineread);
 	    	fd.write("\n");
-//	    	counter++;
-//	    	int bytes_in_buff = fd.available();
-//	    	cout<<"bytes in buff = "<<bytes_in_buff<<endl;
-//	    	fd.read(readline, 300);
-//	    	fd.flushOutput();
-//	    	cout<<readline<<endl;
-//	    	cout<<"counter = "<<counter<<endl;
+	    	counter++;
+	    	int bytes_in_buff = fd.available();
+	    	cout<<"bytes in buff = "<<bytes_in_buff<<endl;
+	    	fd.read(readline, 300);
+	    	fd.flushOutput();
+	    	cout<<readline<<endl;
+	    	cout<<"counter = "<<counter<<endl;
 	    }
 
 	    myfile.close();

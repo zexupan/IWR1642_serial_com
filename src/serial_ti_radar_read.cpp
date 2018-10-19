@@ -9,42 +9,6 @@ uint8_t frame_header_sync[8];
 uint8_t buffer[14];
 
 
-
-//define starting and ending bytes
-#define HDRBYTES      0xAAAA
-#define EDRBYTES      0x5555
-
-//define Message ID of 5 different messages
-#define MSGID_SC      0x0002
-#define MSGID_SB      0x0004
-#define MSGID_SS      0x060A
-#define MSGID_TS      0x070B
-#define MSGID_TI      0x070C
-
-//define the buffer
-#define HEADER        *(uint16_t *)(buffer)
-#define MESSAGE_ID    *(uint16_t *)(buffer + 2)
-#define MESSAGE_INFO  *(uint64_t *)(buffer + 4)
-#define ENDER         *(uint16_t *)(buffer + 12)
-
-//define sensor_status
-//define target status
-//#define NO_NoOfTarget *(uint8_t *)(target_status)
-//#define NO_RollCount  *(uint8_t *)(target_status + 1)
-
-//define target info
-#define TI_Index      *(uint8_t *)(target_info)
-#define TI_Rcs        *(uint8_t *)(target_info + 1)
-#define TI_RangeH     *(uint8_t *)(target_info + 2)
-#define TI_RangeL     *(uint8_t *)(target_info + 3)
-#define TI_Azimuth    *(uint8_t *)(target_info + 4)
-#define TI_VreIH      *(uint8_t *)(target_info + 5)
-#define TI_VreIL      *(uint8_t *)(target_info + 6)
-#define TI_SNR        *(uint8_t *)(target_info + 7)
-
-
-
-
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -82,26 +46,87 @@ int main(int argc, char *argv[])
 
 	ros::Rate rate(60);
 
-	lossync = 0;
+	int lostsync = 0;
+	uint8_t testsync[8];
+
+	testsync[1] = 0x02;
+	testsync[2] = 0x01;
+	testsync[3] = 0x04;
+	testsync[4] = 0x03;
+	testsync[5] = 0x06;
+	testsync[6] = 0x05;
+	testsync[7] = 0x08;
+	testsync[8] = 0x07;
+	
+
+	int got_frame_header = 0;
+	int frame_header_bytes = 52;
 
 	while(ros::ok())
 	{
-		
-		lossync = 0;
-
-		while(lostsync)
+		while(lostsync == 0)
 		{
-			n = 1;
-			while(n < 8)
+			if (got_frame_header == 0)
 			{
-				uint8_t temp_byte;
-				fd.read(&temp_byte, 1);
-				while(temp_byte == testsync)
+				for (int i = 1; i <= 52; i++)
 				{
-					testsync++;
+					uint8_t temp_byte;
+					fd.read(&temp_byte, 1);
+					frame_header[i] = temp_byte;
+				}
+			}
+
+			//check sync pattern
+			for (int i = 0; i < 8; ++i)
+			{
+				if(frame_header[i] != frame_header_sync[i])
+				{
+					lostsync = 1;
+					break;
 				}
 			}
 			
+			//check sum
+			if (got_frame_header == 1)
+			{
+				//check for new sync
+				got_frame_header = 0;
+			}
+			else
+				lostsync = 1; //old frmae
+
+			if (lostsync)
+				break;
+
+
+		}
+
+		while(lostsync)
+		{
+			//Looking for sync data for the header
+			int n = 1;
+			while(n <= 8)
+			{
+				uint8_t temp_byte;
+				fd.read(&temp_byte, 1);
+				if(temp_byte == testsync[n])
+					n++;
+				else n = 1;
+			}
+
+			//Header is found, sync back
+			if (n == 9)
+			{
+				lostsync = 0;
+				//read header, 52-8 bytes
+				for (int i = 9; i <= 52; i++)
+				{
+					uint8_t temp_byte;
+					fd.read(&temp_byte, 1);
+					frame_header[i] = temp_byte;
+				}
+				got_frame_header = 1;
+			}
 		}
 		rate.sleep();
 	}

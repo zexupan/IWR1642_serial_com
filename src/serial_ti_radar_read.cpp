@@ -164,6 +164,9 @@ int main(int argc, char *argv[])
 
 //			cout<<"frame_dataLength = "<<frame_dataLength<<endl;
 
+			cout<<"\n\n\n\nframe no.           "<<target_frame_number<<endl<<endl;
+			cout<<"\nTLV    no.           "<<frame_header_no_tlv<<endl<<endl;
+
 			for (int i = 0; i < frame_header_no_tlv; i++)
 			{
 				for (int i = 0; i < 8; i++)
@@ -171,12 +174,36 @@ int main(int argc, char *argv[])
 					uint8_t temp_byte;
 					fd.read(&temp_byte, 1);
 					tlv_header[i] = temp_byte;
+					printf("%02x ", tlv_header[i]);
 				}
+				
 
-				tlv_dataLength = tlv_header_length - 8;
+				if (tlv_header_type != tlv_header_type_pointCloud && tlv_header_type != tlv_header_type_targetObjectList && tlv_header_type != tlv_header_type_targetIndex)
+					{
+//						printf("  Header is wrong, try adjust once\n");
+						for (int i = 0; i < 7; i++)
+						{
+							tlv_header[i] = tlv_header[i+1];
+						}
+						uint8_t temp_byte;
+						fd.read(&temp_byte, 1);
+						tlv_header[7] = temp_byte;
+						for (int i = 0; i < 8; i++)
+						{
+//							printf("%02x ", tlv_header[i]);
+						}
+//						printf("\n\n");
+					}
+
 
 				if (tlv_header_type == tlv_header_type_pointCloud)
 				{
+					printf("TLV header point cloud found\n\n");
+					tlv_dataLength = tlv_header_length - 8;
+					cout<<endl<<tlv_dataLength<<endl;
+					int no_of_pc = tlv_dataLength/16;
+					printf("%d\n", no_of_pc);
+
 					for (int i = 0; i < tlv_dataLength; i++)
 					{
 						uint8_t temp_byte;
@@ -186,24 +213,43 @@ int main(int argc, char *argv[])
 
 				else if (tlv_header_type == tlv_header_type_targetObjectList)
 				{
-					for (int i = 0; i < tlv_dataLength; i++)
+					printf("TLV header object list found\n\n");
+					tlv_dataLength = tlv_header_length - 8;
+
+					int no_of_objects = tlv_dataLength/68;
+
+					if(no_of_objects > 100)
+						continue;
+
+					printf("%d\n", no_of_objects);
+
+					for (int i = 0; i < no_of_objects; i++)
 					{
-						uint8_t temp_byte;
-						fd.read(&temp_byte, 1);
-						tlv_data_targetObjectList[i] = temp_byte;
+						for (int i = 0; i < 68; i++)
+						{
+							uint8_t temp_byte;
+							fd.read(&temp_byte, 1);
+							tlv_data_targetObjectList[i] = temp_byte;
+						}
+						
+//						cout<<"target no.          "<<tlv_data_targetObjectList_trackID<<endl;
+						printf("target no.   %02x \n", tlv_data_targetObjectList_trackID);
+						cout<<"position     X      "<<tlv_data_targetObjectList_posX<<endl;
+						cout<<"position     Y      "<<tlv_data_targetObjectList_posY<<endl;
+						cout<<"velocity     X      "<<tlv_data_targetObjectList_velX<<endl;
+						cout<<"velocity     Y      "<<tlv_data_targetObjectList_velY<<endl;
+						cout<<"acceleration X      "<<tlv_data_targetObjectList_accX<<endl;
+						cout<<"acceleration Y      "<<tlv_data_targetObjectList_accY<<endl;
 					}
-					cout<<"frame no.           "<<target_frame_number<<endl<<endl;
-					cout<<"target no.          "<<tlv_data_targetObjectList_trackID<<endl;
-					cout<<"position     X      "<<tlv_data_targetObjectList_posX<<endl;
-					cout<<"position     Y      "<<tlv_data_targetObjectList_posY<<endl;
-					cout<<"velocity     X      "<<tlv_data_targetObjectList_velX<<endl;
-					cout<<"velocity     Y      "<<tlv_data_targetObjectList_velY<<endl;
-					cout<<"acceleration X      "<<tlv_data_targetObjectList_accX<<endl;
-					cout<<"acceleration Y      "<<tlv_data_targetObjectList_accY<<endl;
+
+					
 				}
 
 				else if (tlv_header_type == tlv_header_type_targetIndex)
 				{
+					printf("TLV header target index found\n\n");
+					tlv_dataLength = tlv_header_length - 8;
+
 					for (int i = 0; i < tlv_dataLength; i++)
 					{
 						uint8_t temp_byte;
@@ -213,18 +259,10 @@ int main(int argc, char *argv[])
 				else
 				{
 					cout<<"TLV header wrong, lost sync at frame = "<<target_frame_number<<endl;
-					lostsync = 1;
+					lostsync = 1;				
 				}
 			}
 
-//			for (int i = 0; i < frame_dataLength; i++)
-//			{
-//				uint8_t temp_byte;
-//				fd.read(&temp_byte, 1);
-//			}
-//			cout<<"finished reading data at frame "<<target_frame_number<<endl;
-//			double secs =ros::Time::now().toSec();
-//			printf("%f\n", secs);
 			lostsync = 1;
 		}
 
@@ -247,7 +285,7 @@ int main(int argc, char *argv[])
 			//Header is found, sync back
 			if (n == 8)
 			{
-				printf("found frame header, exit lostsync while loop\n");
+//				printf("found frame header, exit lostsync while loop\n");
 				lostsync = 0;
 				//read header, 52-8 bytes
 				for (int i = 8; i < 52; i++)

@@ -2,6 +2,7 @@
 #include "serial/serial.h"
 #include "sys/types.h"
 #include <math.h>
+#include <geometry_msgs/PointStamped.h>
 
 //define 5 different messages and the buffer
 uint8_t frame_header[52];
@@ -32,6 +33,7 @@ uint8_t tlv_data_targetObjectList[68];
 #define tlv_header_type_targetIndex         0x00000008
 
 using namespace std;
+geometry_msgs::PointStamped posMsg;
 
 int main(int argc, char *argv[])
 {
@@ -67,6 +69,8 @@ int main(int argc, char *argv[])
 	}
 
 	ros::Rate rate(100);
+
+	ros::Publisher posPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info", 1000);
 
 	int lostsync = 1;
 	uint8_t testsync[8];
@@ -240,6 +244,14 @@ int main(int argc, char *argv[])
 						cout<<"velocity     Y      "<<tlv_data_targetObjectList_velY<<endl;
 						cout<<"acceleration X      "<<tlv_data_targetObjectList_accX<<endl;
 						cout<<"acceleration Y      "<<tlv_data_targetObjectList_accY<<endl;
+
+						posMsg.header.stamp = ros::Time::now();
+						posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+						posMsg.point.x = tlv_data_targetObjectList_posX;
+						posMsg.point.y = tlv_data_targetObjectList_posY;
+						posMsg.point.z = 0.0;
+						posPub.publish(posMsg);
+
 					}
 
 					

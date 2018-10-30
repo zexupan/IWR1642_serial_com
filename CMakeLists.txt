@@ -206,3 +206,7 @@ add_dependencies(serial_ti_radar serial_ti_radar_generate_messages_cpp)
 add_executable(serial_ti_radar_read src/serial_ti_radar_read.cpp)
 target_link_libraries(serial_ti_radar_read ${catkin_LIBRARIES})
 add_dependencies(serial_ti_radar_read serial_ti_radar_generate_messages_cpp)
+
+add_executable(listener src/listener.cpp)
+target_link_libraries(listener ${catkin_LIBRARIES})
+add_dependencies(listener serial_ti_radar_generate_messages_cpp)

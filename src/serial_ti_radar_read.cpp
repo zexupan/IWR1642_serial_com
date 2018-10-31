@@ -23,7 +23,7 @@ uint8_t tlv_data_targetObjectList[68];
 #define tlv_data_targetObjectList_velY                    *(float *)(tlv_data_targetObjectList + 16)
 #define tlv_data_targetObjectList_accX                    *(float *)(tlv_data_targetObjectList + 20)
 #define tlv_data_targetObjectList_accY                    *(float *)(tlv_data_targetObjectList + 24)
-#define tlv_data_targetObjectList_covarianceMatrix[9]     *(float *)(tlv_data_targetObjectList + 28) 
+//#define tlv_data_targetObjectList_covarianceMatrix[9]     *(float *)(tlv_data_targetObjectList + 28) 
 #define tlv_data_targetObjectList_gatingFunctionGain      *(float *)(tlv_data_targetObjectList + 64)
 
 
@@ -34,6 +34,38 @@ uint8_t tlv_data_targetObjectList[68];
 
 using namespace std;
 geometry_msgs::PointStamped posMsg;
+/*geometry_msgs::PointStamped pos1Msg;
+geometry_msgs::PointStamped pos2Msg;
+geometry_msgs::PointStamped pos3Msg;
+geometry_msgs::PointStamped pos4Msg;
+geometry_msgs::PointStamped pos5Msg;
+geometry_msgs::PointStamped pos6Msg;
+geometry_msgs::PointStamped pos7Msg;
+geometry_msgs::PointStamped pos8Msg;
+geometry_msgs::PointStamped pos9Msg;
+geometry_msgs::PointStamped posaMsg;
+geometry_msgs::PointStamped posbMsg;
+geometry_msgs::PointStamped poscMsg;
+geometry_msgs::PointStamped posdMsg;
+geometry_msgs::PointStamped poseMsg;
+geometry_msgs::PointStamped posfMsg;
+geometry_msgs::PointStamped pos10Msg;
+geometry_msgs::PointStamped pos11Msg;
+geometry_msgs::PointStamped pos12Msg;
+geometry_msgs::PointStamped pos13Msg;
+geometry_msgs::PointStamped pos14Msg;
+geometry_msgs::PointStamped pos15Msg;
+geometry_msgs::PointStamped pos16Msg;
+geometry_msgs::PointStamped pos17Msg;
+geometry_msgs::PointStamped pos18Msg;
+geometry_msgs::PointStamped pos19Msg;
+geometry_msgs::PointStamped pos1aMsg;
+geometry_msgs::PointStamped pos1bMsg;
+geometry_msgs::PointStamped pos1cMsg;
+geometry_msgs::PointStamped pos1dMsg;
+geometry_msgs::PointStamped pos1eMsg;
+geometry_msgs::PointStamped pos1fMsg;
+*/
 
 int main(int argc, char *argv[])
 {
@@ -70,7 +102,38 @@ int main(int argc, char *argv[])
 
 	ros::Rate rate(100);
 
-	ros::Publisher posPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info", 1000);
+	ros::Publisher pos0Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info0", 1000);
+	ros::Publisher pos1Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1", 1000);
+	ros::Publisher pos2Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info2", 1000);
+	ros::Publisher pos3Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info3", 1000);
+	ros::Publisher pos4Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info4", 1000);
+	ros::Publisher pos5Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info5", 1000);
+	ros::Publisher pos6Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info6", 1000);
+	ros::Publisher pos7Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info7", 1000);
+	ros::Publisher pos8Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info8", 1000);
+	ros::Publisher pos9Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info9", 1000);
+	ros::Publisher posaPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoa", 1000);
+	ros::Publisher posbPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infob", 1000);
+	ros::Publisher poscPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoc", 1000);
+	ros::Publisher posdPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infod", 1000);
+	ros::Publisher posePub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoe", 1000);
+	ros::Publisher posfPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infof", 1000);
+	ros::Publisher pos10Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info10", 1000);
+	ros::Publisher pos11Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info11", 1000);
+	ros::Publisher pos12Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info12", 1000);
+	ros::Publisher pos13Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info13", 1000);
+	ros::Publisher pos14Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info14", 1000);
+	ros::Publisher pos15Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info15", 1000);
+	ros::Publisher pos16Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info16", 1000);
+	ros::Publisher pos17Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info17", 1000);
+	ros::Publisher pos18Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info18", 1000);
+	ros::Publisher pos19Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info19", 1000);
+	ros::Publisher pos1aPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1a", 1000);
+	ros::Publisher pos1bPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1b", 1000);
+	ros::Publisher pos1cPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1c", 1000);
+	ros::Publisher pos1dPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1d", 1000);
+	ros::Publisher pos1ePub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1e", 1000);
+	ros::Publisher pos1fPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1f", 1000);
 
 	int lostsync = 1;
 	uint8_t testsync[8];
@@ -250,7 +313,135 @@ int main(int argc, char *argv[])
 						posMsg.point.x = tlv_data_targetObjectList_posX;
 						posMsg.point.y = tlv_data_targetObjectList_posY;
 						posMsg.point.z = 0.0;
-						posPub.publish(posMsg);
+
+						if (tlv_data_targetObjectList_trackID == 0x00)
+						{
+							pos0Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x01)
+						{
+							pos1Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x02)
+						{
+							pos2Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x03)
+						{
+							pos3Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x04)
+						{
+							pos4Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x05)
+						{
+							pos5Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x06)
+						{
+							pos6Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x07)
+						{
+							pos7Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x08)
+						{
+							pos8Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x09)
+						{
+							pos9Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x0a)
+						{
+							posaPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x0b)
+						{
+							posbPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x0c)
+						{
+							poscPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x0d)
+						{
+							posdPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x0e)
+						{
+							posePub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x0f)
+						{
+							posfPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x10)
+						{
+							pos10Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x11)
+						{
+							pos11Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x12)
+						{
+							pos12Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x13)
+						{
+							pos13Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x14)
+						{
+							pos14Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x15)
+						{
+							pos15Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x16)
+						{
+							pos16Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x17)
+						{
+							pos17Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x18)
+						{
+							pos18Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x19)
+						{
+							pos19Pub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x1a)
+						{
+							pos1aPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x1b)
+						{
+							pos1bPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x1c)
+						{
+							pos1cPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x1d)
+						{
+							pos1dPub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x1e)
+						{
+							pos1ePub.publish(posMsg);
+						}
+						if (tlv_data_targetObjectList_trackID == 0x1f)
+						{
+							pos1fPub.publish(posMsg);
+						}		
 
 					}
 

@@ -34,38 +34,7 @@ uint8_t tlv_data_targetObjectList[68];
 
 using namespace std;
 geometry_msgs::PointStamped posMsg;
-/*geometry_msgs::PointStamped pos1Msg;
-geometry_msgs::PointStamped pos2Msg;
-geometry_msgs::PointStamped pos3Msg;
-geometry_msgs::PointStamped pos4Msg;
-geometry_msgs::PointStamped pos5Msg;
-geometry_msgs::PointStamped pos6Msg;
-geometry_msgs::PointStamped pos7Msg;
-geometry_msgs::PointStamped pos8Msg;
-geometry_msgs::PointStamped pos9Msg;
-geometry_msgs::PointStamped posaMsg;
-geometry_msgs::PointStamped posbMsg;
-geometry_msgs::PointStamped poscMsg;
-geometry_msgs::PointStamped posdMsg;
-geometry_msgs::PointStamped poseMsg;
-geometry_msgs::PointStamped posfMsg;
-geometry_msgs::PointStamped pos10Msg;
-geometry_msgs::PointStamped pos11Msg;
-geometry_msgs::PointStamped pos12Msg;
-geometry_msgs::PointStamped pos13Msg;
-geometry_msgs::PointStamped pos14Msg;
-geometry_msgs::PointStamped pos15Msg;
-geometry_msgs::PointStamped pos16Msg;
-geometry_msgs::PointStamped pos17Msg;
-geometry_msgs::PointStamped pos18Msg;
-geometry_msgs::PointStamped pos19Msg;
-geometry_msgs::PointStamped pos1aMsg;
-geometry_msgs::PointStamped pos1bMsg;
-geometry_msgs::PointStamped pos1cMsg;
-geometry_msgs::PointStamped pos1dMsg;
-geometry_msgs::PointStamped pos1eMsg;
-geometry_msgs::PointStamped pos1fMsg;
-*/
+
 
 int main(int argc, char *argv[])
 {
@@ -157,64 +126,53 @@ int main(int argc, char *argv[])
 	int no_input_points;
 
 	while(ros::ok())
-	{
-		while(lostsync == 0)
+	{	
+		while(lostsync)
 		{
-/*			if (got_frame_header == 0)
+			//Looking for sync data for the header
+			int n = 0;
+			while(n < 8)
 			{
-				for (int i = 0; i < 52; i++)
+				while(fd.available() <= 0);
+				uint8_t temp_byte;
+				fd.read(&temp_byte, 1);
+				if(temp_byte == testsync[n])
 				{
+					frame_header[n] = temp_byte;
+					n++;
+				}
+				else n = 0;
+			}
+
+			//Header is found, sync back
+			if (n == 8)
+			{
+//				printf("found frame header, exit lostsync while loop\n");
+				lostsync = 0;
+				//read header, 52-8 bytes
+				for (int i = 8; i < 52; i++ )
+				{
+					while(fd.available() <= 0);
 					uint8_t temp_byte;
 					fd.read(&temp_byte, 1);
 					frame_header[i] = temp_byte;
-//					printf("%02x ", frame_header[i]);
 				}
-//				printf("\n\n");
 			}
+		}
 
-			//check sync pattern
-			for (int i = 0; i < 8; i++)
+		while(lostsync == 0)
+		{
+			
+			if (frame_header_frame_number > target_frame_number)
 			{
-				if(frame_header[i] != testsync[i])
-				{
-					lostsync = 1;
-					break;
-				}
+				target_frame_number = frame_header_frame_number;
+
 			}
-
-
-			//check sum..................................................................................
-
-*/
-			if (got_frame_header == 1)
+			else
 			{
-				//check for new sync
-				for (int i = 0; i < 8; i++)
-				{
-					if (frame_header[i] != testsync[i])
-					{
-						lostsync = 1;
-						got_frame_header = 0;
-					}
-				}
-
-				if (frame_header_frame_number > target_frame_number)
-				{
-					target_frame_number = frame_header_frame_number;
-					got_frame_header = 0;
-				}
-				else
-				{
-					lostsync = 1; //old frame
-					got_frame_header = 0;
-				}
-			}
-
-			if (lostsync){
-
+				lostsync = 1; //old frame
 				break;
 			}
-
 
 			//we got a valid header
 			frame_dataLength = frame_header_package_length - 52;
@@ -231,48 +189,51 @@ int main(int argc, char *argv[])
 
 //			cout<<"frame_dataLength = "<<frame_dataLength<<endl;
 
-			cout<<"\n\n\n\nframe no.           "<<target_frame_number<<endl<<endl;
-			cout<<"\nTLV    no.           "<<frame_header_no_tlv<<endl<<endl;
+			cout<<"\n\nframe no.           "<<target_frame_number<<endl<<endl;
+//			cout<<"\nTLV    no.           "<<frame_header_no_tlv<<endl<<endl;
 
 			for (int i = 0; i < frame_header_no_tlv; i++)
 			{
 				for (int i = 0; i < 8; i++)
 				{
+					while(fd.available() <= 0);
 					uint8_t temp_byte;
 					fd.read(&temp_byte, 1);
 					tlv_header[i] = temp_byte;
-					printf("%02x ", tlv_header[i]);
+//					printf("%02x ", tlv_header[i]);
 				}
 				
 
 				if (tlv_header_type != tlv_header_type_pointCloud && tlv_header_type != tlv_header_type_targetObjectList && tlv_header_type != tlv_header_type_targetIndex)
 					{
-//						printf("  Header is wrong, try adjust once\n");
-						for (int i = 0; i < 7; i++)
-						{
-							tlv_header[i] = tlv_header[i+1];
-						}
-						uint8_t temp_byte;
-						fd.read(&temp_byte, 1);
-						tlv_header[7] = temp_byte;
+						printf("Header is wrong...............................!!!!!!!!!!!!!!!!!!!!!");
+//						for (int i = 0; i < 7; i++)
+//						{
+//							tlv_header[i] = tlv_header[i+1];
+//						}
+//						uint8_t temp_byte;
+//						fd.read(&temp_byte, 1);
+//						tlv_header[7] = temp_byte;
+
 						for (int i = 0; i < 8; i++)
 						{
-//							printf("%02x ", tlv_header[i]);
+							printf("%02x ", tlv_header[i]);
 						}
-//						printf("\n\n");
+						printf("\n");
 					}
 
 
 				if (tlv_header_type == tlv_header_type_pointCloud)
 				{
-					printf("TLV header point cloud found\n\n");
+//					printf("TLV header point cloud found\n\n");
 					tlv_dataLength = tlv_header_length - 8;
-					cout<<endl<<tlv_dataLength<<endl;
+//					cout<<endl<<tlv_dataLength<<endl;
 					int no_of_pc = tlv_dataLength/16;
-					printf("%d\n", no_of_pc);
+//					printf("%d\n", no_of_pc);
 
 					for (int i = 0; i < tlv_dataLength; i++)
 					{
+						while(fd.available() <= 0);
 						uint8_t temp_byte;
 						fd.read(&temp_byte, 1);
 					}
@@ -280,25 +241,26 @@ int main(int argc, char *argv[])
 
 				else if (tlv_header_type == tlv_header_type_targetObjectList)
 				{
-					printf("TLV header object list found\n\n");
+//					printf("TLV header object list found\n\n");
 					tlv_dataLength = tlv_header_length - 8;
 
 					int no_of_objects = tlv_dataLength/68;
 
-					if(no_of_objects > 100)
+					if(no_of_objects > 10)
 						continue;
 
-					printf("%d\n", no_of_objects);
+//					printf("%d\n", no_of_objects);
 
 					for (int i = 0; i < no_of_objects; i++)
 					{
 						for (int i = 0; i < 68; i++)
 						{
+							while(fd.available() <= 0);
 							uint8_t temp_byte;
 							fd.read(&temp_byte, 1);
 							tlv_data_targetObjectList[i] = temp_byte;
 						}
-						
+/*						
 //						cout<<"target no.          "<<tlv_data_targetObjectList_trackID<<endl;
 						printf("target no.   %02x \n", tlv_data_targetObjectList_trackID);
 						cout<<"position     X      "<<tlv_data_targetObjectList_posX<<endl;
@@ -306,7 +268,7 @@ int main(int argc, char *argv[])
 						cout<<"velocity     X      "<<tlv_data_targetObjectList_velX<<endl;
 						cout<<"velocity     Y      "<<tlv_data_targetObjectList_velY<<endl;
 						cout<<"acceleration X      "<<tlv_data_targetObjectList_accX<<endl;
-						cout<<"acceleration Y      "<<tlv_data_targetObjectList_accY<<endl;
+						cout<<"acceleration Y      "<<tlv_data_targetObjectList_accY<<endl<<endl;
 
 						posMsg.header.stamp = ros::Time::now();
 						posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
@@ -442,66 +404,32 @@ int main(int argc, char *argv[])
 						{
 							pos1fPub.publish(posMsg);
 						}		
-
+*/
 					}
-
-					
 				}
 
 				else if (tlv_header_type == tlv_header_type_targetIndex)
 				{
-					printf("TLV header target index found\n\n");
+//					printf("TLV header target index found\n\n");
 					tlv_dataLength = tlv_header_length - 8;
 
 					for (int i = 0; i < tlv_dataLength; i++)
 					{
+						while(fd.available() <= 0);
 						uint8_t temp_byte;
 						fd.read(&temp_byte, 1);
 					}
 				}
 				else
 				{
-					cout<<"TLV header wrong, lost sync at frame = "<<target_frame_number<<endl;
+					cout<<"TLV header wrong, lost sync at frame = "<<target_frame_number<<endl<<endl;
 					lostsync = 1;				
 				}
 			}
 
 			lostsync = 1;
 		}
-
-		while(lostsync)
-		{
-			//Looking for sync data for the header
-			int n = 0;
-			while(n < 8)
-			{
-				uint8_t temp_byte;
-				fd.read(&temp_byte, 1);
-				if(temp_byte == testsync[n])
-				{
-					frame_header[n] = temp_byte;
-					n++;
-				}
-				else n = 0;
-			}
-
-			//Header is found, sync back
-			if (n == 8)
-			{
-//				printf("found frame header, exit lostsync while loop\n");
-				lostsync = 0;
-				//read header, 52-8 bytes
-				for (int i = 8; i < 52; i++)
-				{
-					uint8_t temp_byte;
-					fd.read(&temp_byte, 1);
-					frame_header[i] = temp_byte;
-				}
-				got_frame_header = 1;
-			}
-		}
 		rate.sleep();
 	}
-	
 }
 

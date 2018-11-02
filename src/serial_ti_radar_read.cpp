@@ -23,7 +23,6 @@ uint8_t tlv_data_targetObjectList[68];
 #define tlv_data_targetObjectList_velY                    *(float *)(tlv_data_targetObjectList + 16)
 #define tlv_data_targetObjectList_accX                    *(float *)(tlv_data_targetObjectList + 20)
 #define tlv_data_targetObjectList_accY                    *(float *)(tlv_data_targetObjectList + 24)
-//#define tlv_data_targetObjectList_covarianceMatrix[9]     *(float *)(tlv_data_targetObjectList + 28) 
 #define tlv_data_targetObjectList_gatingFunctionGain      *(float *)(tlv_data_targetObjectList + 64)
 
 
@@ -69,40 +68,10 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	ros::Rate rate(100);
+	ros::Rate rate(20);
 
 	ros::Publisher pos0Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info0", 1000);
-	ros::Publisher pos1Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1", 1000);
-	ros::Publisher pos2Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info2", 1000);
-	ros::Publisher pos3Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info3", 1000);
-	ros::Publisher pos4Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info4", 1000);
-	ros::Publisher pos5Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info5", 1000);
-	ros::Publisher pos6Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info6", 1000);
-	ros::Publisher pos7Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info7", 1000);
-	ros::Publisher pos8Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info8", 1000);
-	ros::Publisher pos9Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info9", 1000);
-	ros::Publisher posaPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoa", 1000);
-	ros::Publisher posbPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infob", 1000);
-	ros::Publisher poscPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoc", 1000);
-	ros::Publisher posdPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infod", 1000);
-	ros::Publisher posePub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoe", 1000);
-	ros::Publisher posfPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infof", 1000);
-	ros::Publisher pos10Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info10", 1000);
-	ros::Publisher pos11Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info11", 1000);
-	ros::Publisher pos12Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info12", 1000);
-	ros::Publisher pos13Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info13", 1000);
-	ros::Publisher pos14Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info14", 1000);
-	ros::Publisher pos15Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info15", 1000);
-	ros::Publisher pos16Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info16", 1000);
-	ros::Publisher pos17Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info17", 1000);
-	ros::Publisher pos18Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info18", 1000);
-	ros::Publisher pos19Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info19", 1000);
-	ros::Publisher pos1aPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1a", 1000);
-	ros::Publisher pos1bPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1b", 1000);
-	ros::Publisher pos1cPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1c", 1000);
-	ros::Publisher pos1dPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1d", 1000);
-	ros::Publisher pos1ePub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1e", 1000);
-	ros::Publisher pos1fPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1f", 1000);
+
 
 	int lostsync = 1;
 	uint8_t testsync[8];
@@ -260,7 +229,7 @@ int main(int argc, char *argv[])
 							fd.read(&temp_byte, 1);
 							tlv_data_targetObjectList[i] = temp_byte;
 						}
-/*						
+						
 //						cout<<"target no.          "<<tlv_data_targetObjectList_trackID<<endl;
 						printf("target no.   %02x \n", tlv_data_targetObjectList_trackID);
 						cout<<"position     X      "<<tlv_data_targetObjectList_posX<<endl;
@@ -276,7 +245,70 @@ int main(int argc, char *argv[])
 						posMsg.point.y = tlv_data_targetObjectList_posY;
 						posMsg.point.z = 0.0;
 
-						if (tlv_data_targetObjectList_trackID == 0x00)
+						pos0Pub.publish(posMsg);
+
+					}
+				}
+
+				else if (tlv_header_type == tlv_header_type_targetIndex)
+				{
+//					printf("TLV header target index found\n\n");
+					tlv_dataLength = tlv_header_length - 8;
+
+					for (int i = 0; i < tlv_dataLength; i++)
+					{
+						while(fd.available() <= 0);
+						uint8_t temp_byte;
+						fd.read(&temp_byte, 1);
+					}
+				}
+				else
+				{
+					cout<<"TLV header wrong, lost sync at frame = "<<target_frame_number<<endl<<endl;
+					lostsync = 1;				
+				}
+			}
+
+			lostsync = 1;
+		}
+		rate.sleep();
+	}
+}
+
+/*
+	ros::Publisher pos1Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1", 1000);
+	ros::Publisher pos2Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info2", 1000);
+	ros::Publisher pos3Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info3", 1000);
+	ros::Publisher pos4Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info4", 1000);
+	ros::Publisher pos5Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info5", 1000);
+	ros::Publisher pos6Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info6", 1000);
+	ros::Publisher pos7Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info7", 1000);
+	ros::Publisher pos8Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info8", 1000);
+	ros::Publisher pos9Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info9", 1000);
+	ros::Publisher posaPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoa", 1000);
+	ros::Publisher posbPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infob", 1000);
+	ros::Publisher poscPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoc", 1000);
+	ros::Publisher posdPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infod", 1000);
+	ros::Publisher posePub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infoe", 1000);
+	ros::Publisher posfPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_infof", 1000);
+	ros::Publisher pos10Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info10", 1000);
+	ros::Publisher pos11Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info11", 1000);
+	ros::Publisher pos12Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info12", 1000);
+	ros::Publisher pos13Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info13", 1000);
+	ros::Publisher pos14Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info14", 1000);
+	ros::Publisher pos15Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info15", 1000);
+	ros::Publisher pos16Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info16", 1000);
+	ros::Publisher pos17Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info17", 1000);
+	ros::Publisher pos18Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info18", 1000);
+	ros::Publisher pos19Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info19", 1000);
+	ros::Publisher pos1aPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1a", 1000);
+	ros::Publisher pos1bPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1b", 1000);
+	ros::Publisher pos1cPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1c", 1000);
+	ros::Publisher pos1dPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1d", 1000);
+	ros::Publisher pos1ePub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1e", 1000);
+	ros::Publisher pos1fPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1f", 1000);
+
+	if (tlv_data_targetObjectList_trackID == 0x00)
 						{
 							pos0Pub.publish(posMsg);
 						}
@@ -403,33 +435,7 @@ int main(int argc, char *argv[])
 						if (tlv_data_targetObjectList_trackID == 0x1f)
 						{
 							pos1fPub.publish(posMsg);
-						}		
-*/
-					}
-				}
+						}
 
-				else if (tlv_header_type == tlv_header_type_targetIndex)
-				{
-//					printf("TLV header target index found\n\n");
-					tlv_dataLength = tlv_header_length - 8;
 
-					for (int i = 0; i < tlv_dataLength; i++)
-					{
-						while(fd.available() <= 0);
-						uint8_t temp_byte;
-						fd.read(&temp_byte, 1);
-					}
-				}
-				else
-				{
-					cout<<"TLV header wrong, lost sync at frame = "<<target_frame_number<<endl<<endl;
-					lostsync = 1;				
-				}
-			}
-
-			lostsync = 1;
-		}
-		rate.sleep();
-	}
-}
-
+						*/

@@ -7,7 +7,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <mavros_msgs/State.h>
-#include <sensor_msgs/Imu>
+#include <sensor_msgs/Imu.h>
 
 mavros_msgs::State current_state;
 sensor_msgs::Imu current_Imu;

@@ -40,7 +40,8 @@ int main(int argc, char **argv)
 
     while(ros::ok()){
         cout<<current_state<<endl;
-        cout<<current_imu<<endl;
+        cout<<current_imu.orientation<<endl<<endl;
+        cout<<current_imu.orientation.x<<endl<<endl;
         ros::spinOnce();
         rate.sleep();
     }

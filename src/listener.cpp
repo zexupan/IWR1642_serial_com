@@ -18,7 +18,7 @@ void state_cb(const mavros_msgs::State::ConstPtr& msg){
     current_state = *msg;
 }
 
-void imu_cb(const sensor_msgs::imu::ConstPtr& msg){
+void imu_cb(const sensor_msgs::Imu::ConstPtr& msg){
     current_imu = *msg;
 }
 

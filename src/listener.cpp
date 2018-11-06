@@ -32,6 +32,9 @@ int main(int argc, char **argv)
 
     while(ros::ok()){
         cout<<current_state.mode<<endl;
+        cout<<current_state.connected<<endl;
+        cout<<current_state.armed<<endl;
+        cout<<current_state.guided<<endl;
 
             
 

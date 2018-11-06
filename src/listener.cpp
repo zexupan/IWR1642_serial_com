@@ -9,13 +9,21 @@
 #include <mavros_msgs/State.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
+#include <sensor_msgs/Imu>
 
 mavros_msgs::State current_state;
+sensor_msgs::Imu current_imu;
+
 using namespace std;
 
 void state_cb(const mavros_msgs::State::ConstPtr& msg){
     current_state = *msg;
 }
+
+void imu_cb(const sensor_msgs::Imu::ConstPtr& msg){
+    current_imu = *msg;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -24,6 +32,8 @@ int main(int argc, char **argv)
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
+    ros::Subscriber state_sub = nh.subscribe<sensor_msgs::Imu>
+            ("mavros/imu/data", 10, imu_cb);
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
@@ -31,13 +41,8 @@ int main(int argc, char **argv)
     ros::Time last_request = ros::Time::now();
 
     while(ros::ok()){
-        cout<<current_state.mode<<endl;
-        cout<<current_state.connected<<endl;
-        cout<<current_state.armed<<endl;
-        cout<<current_state.guided<<endl;
-
-            
-
+        cout<<current_state<<endl;
+        cout<<imu<<endl;
         ros::spinOnce();
         rate.sleep();
     }

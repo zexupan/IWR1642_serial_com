@@ -7,10 +7,10 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <mavros_msgs/State.h>
-#include <sensor_msgs/imu>
+#include <sensor_msgs/Imu>
 
 mavros_msgs::State current_state;
-sensor_msgs::imu current_imu;
+sensor_msgs::Imu current_Imu;
 
 using namespace std;
 
@@ -18,8 +18,8 @@ void state_cb(const mavros_msgs::State::ConstPtr& msg){
     current_state = *msg;
 }
 
-void imu_cb(const sensor_msgs::imu::ConstPtr& msg){
-    current_imu = *msg;
+void Imu_cb(const sensor_msgs::Imu::ConstPtr& msg){
+    current_Imu = *msg;
 }
 
 
@@ -30,8 +30,8 @@ int main(int argc, char **argv)
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
-    ros::Subscriber state_sub = nh.subscribe<sensor_msgs::imu>
-            ("mavros/imu/data", 10, imu_cb);
+    ros::Subscriber state_sub = nh.subscribe<sensor_msgs::Imu>
+            ("mavros/Imu/data", 10, Imu_cb);
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 
     while(ros::ok()){
         cout<<current_state<<endl;
-        cout<<imu<<endl;
+        cout<<Imu<<endl;
         ros::spinOnce();
         rate.sleep();
     }

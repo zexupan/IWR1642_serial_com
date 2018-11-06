@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
-    ros::Subscriber state_sub = nh.subscribe<sensor_msgs::Imu>
+    ros::Subscriber imu_sub = nh.subscribe<sensor_msgs::Imu>
             ("mavros/imu/data", 10, imu_cb);
 
     //the setpoint publishing rate MUST be faster than 2Hz
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 
     while(ros::ok()){
         cout<<current_state<<endl;
-        cout<<Imu<<endl;
+        cout<<current_imu<<endl;
         ros::spinOnce();
         rate.sleep();
     }

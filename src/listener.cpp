@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
-            ("mavros/imu/data", 10, state_cb);
+            ("mavros/state", 10, state_cb);
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);

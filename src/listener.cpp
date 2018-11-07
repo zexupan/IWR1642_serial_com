@@ -67,6 +67,7 @@ int main(int argc, char **argv)
 //        cout<<current_imu.orientation.x<<endl<<endl;
         
         yaw_angle = toEulerAngle(current_imu.orientation.w, current_imu.orientation.x,current_imu.orientation.y,current_imu.orientation.z);
+        yaw_angle = yaw_angle * 180/ 3.1415926;
         printf("yaw:   %lf \n", yaw_angle);
         ros::spinOnce();
         rate.sleep();

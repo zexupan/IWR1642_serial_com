@@ -22,6 +22,27 @@ void imu_cb(const sensor_msgs::Imu::ConstPtr& msg){
     current_imu = *msg;
 }
 
+double toEulerAngle(double q_w, double q_x, double q_y, double q_z)
+{
+  // roll (x-axis rotation)
+  double sinr_cosp = +2.0 * (q_w * q_x + q_y * q_z);
+  double cosr_cosp = +1.0 - 2.0 * (q_x * q_x + q_y * q_y);
+  double roll = atan2(sinr_cosp, cosr_cosp);
+
+  // pitch (y-axis rotation)
+  double sinp = +2.0 * (q_w * q_y - q_z * q_x);
+  if (fabs(sinp) >= 1)
+  double   pitch = copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+  else
+  double   pitch = asin(sinp);
+
+  // yaw (z-axis rotation)
+  double siny_cosp = +2.0 * (q_w * q_z + q_x * q_y);
+  double cosy_cosp = +1.0 - 2.0 * (q_y * q_y + q_z * q_z);  
+  double yaw = atan2(siny_cosp, cosy_cosp);
+  return yaw;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -38,13 +59,18 @@ int main(int argc, char **argv)
 
     ros::Time last_request = ros::Time::now();
 
+    double yaw_angle;
+
     while(ros::ok()){
-        cout<<current_state<<endl;
-        cout<<current_imu.orientation<<endl<<endl;
-        cout<<current_imu.orientation.x<<endl<<endl;
+//        cout<<current_state<<endl;
+//        cout<<current_imu.orientation<<endl<<endl;
+//        cout<<current_imu.orientation.x<<endl<<endl;
+        
+        yaw_angle = toEulerAngle(current_imu.orientation.w, current_imu.orientation.x,current_imu.orientation.y,current_imu.orientation.z);
+        printf("yaw:   %lf \n", yaw_angle);
         ros::spinOnce();
         rate.sleep();
     }
-
     return 0;
 }
+

@@ -43,6 +43,13 @@ double toEulerAngle(double q_w, double q_x, double q_y, double q_z)
   return yaw;
 }
 
+void frame_conversion_yaw(double input_yaw, double input_x, double input_y, double output_x, double output_y)
+{
+  //convert body frame to local frame
+  output_x = input_x * cos(input_yaw) - input_y * sin(input_yaw);
+  output_y = input_x * sin(input_yaw) + input_y * cos(input_yaw);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -60,6 +67,7 @@ int main(int argc, char **argv)
     ros::Time last_request = ros::Time::now();
 
     double yaw_angle;
+    double pos_x, pos_y;
 
     while(ros::ok()){
 //        cout<<current_state<<endl;
@@ -67,8 +75,9 @@ int main(int argc, char **argv)
 //        cout<<current_imu.orientation.x<<endl<<endl;
         
         yaw_angle = toEulerAngle(current_imu.orientation.w, current_imu.orientation.x,current_imu.orientation.y,current_imu.orientation.z);
-        yaw_angle = yaw_angle * 180/ 3.1415926;
-        printf("yaw:   %lf \n", yaw_angle);
+        printf("yaw:   %lf       ", yaw_angle * 180/ 3.1415926);
+        frame_conversion_yaw(yaw_angle, 2, 0, pos_x, pos_y);
+        printf("x = %lf    y = %lf    \n", pos_x, pos_y);
         ros::spinOnce();
         rate.sleep();
     }

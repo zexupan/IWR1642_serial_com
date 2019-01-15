@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <node pkg="serial_ti_radar" name="serial_ti_radar" type="serial_ti_radar" output="screen">
+    <node pkg="serial_ti_radar" name="serial_ti_radar_config" type="serial_ti_radar_config" output="screen">
 	    <param name="serialPort" type="string" value="/dev/ttyACM0" />
     </node>
     <node name="radar_record" pkg="rosbag" type="record" args="-o $(find serial_radar)/bag/serial_radar_record /radarBAG"/>

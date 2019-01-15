@@ -36,6 +36,7 @@ double object_list_range[32];
 
 using namespace std;
 geometry_msgs::PointStamped posMsg;
+geometry_msgs::PointStamped pos1Msg;
 
 
 bool inverse4x4(float m[],float invOut[])
@@ -575,6 +576,7 @@ int main(int argc, char *argv[])
 	ros::Rate rate(20);
 
 	ros::Publisher pos0Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info0", 1000);
+	ros::Publisher pos1Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1", 1000);
 
 
 	int lostsync = 1;
@@ -812,8 +814,17 @@ int main(int argc, char *argv[])
 					posMsg.point.x = object_list[last_track_ID_index][0];
 					posMsg.point.y = object_list[last_track_ID_index][1];
 					posMsg.point.z = 0.0;
-
 					pos0Pub.publish(posMsg);
+
+					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][2] , object_list[last_track_ID_index][1], object_list[last_track_ID_index][3]);
+
+					pos1Msg.header.stamp = ros::Time::now();
+					pos1Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+					pos1Msg.point.x = Est_Target_Position_x;
+					pos1Msg.point.y = Est_Target_Position_y;
+					pos1Msg.point.z = 0.0;
+					pos1Pub.publish(pos1Msg);
+				
 				}
 
 				else if (tlv_header_type == tlv_header_type_targetIndex)

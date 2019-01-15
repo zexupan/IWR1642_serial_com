@@ -200,14 +200,14 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(serial_ti_radar src/serial_ti_radar.cpp)
-target_link_libraries(serial_ti_radar ${catkin_LIBRARIES})
-add_dependencies(serial_ti_radar serial_ti_radar_generate_messages_cpp)
+add_executable(serial_ti_radar_config src/serial_ti_radar_config.cpp)
+target_link_libraries(serial_ti_radar_config ${catkin_LIBRARIES})
+add_dependencies(serial_ti_radar_config serial_ti_radar_generate_messages_cpp)
 
 add_executable(serial_ti_radar_read src/serial_ti_radar_read.cpp)
 target_link_libraries(serial_ti_radar_read ${catkin_LIBRARIES})
 add_dependencies(serial_ti_radar_read serial_ti_radar_generate_messages_cpp)
 
-add_executable(listener src/listener.cpp)
-target_link_libraries(listener ${catkin_LIBRARIES})
-add_dependencies(listener serial_ti_radar_generate_messages_cpp)
+add_executable(frame_conversion src/frame_conversion.cpp)
+target_link_libraries(frame_conversion ${catkin_LIBRARIES})
+add_dependencies(frame_conversion serial_ti_radar_generate_messages_cpp)

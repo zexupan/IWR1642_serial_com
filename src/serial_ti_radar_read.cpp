@@ -177,11 +177,11 @@ double Est_Target_Velocity_x;
 double Est_Target_Velocity_y;
 float dt_est = 0.05;
 float Mea_Pos_x_err = 0.1;
-float Mea_Pos_y_err = 5;
-float Mea_Vel_x_err = 1.2;
-float Mea_Vel_y_err = 5;
-float Pro_Pos_x_err = 0.1;
-float Pro_Pos_y_err = 1.2;
+float Mea_Pos_y_err = 0.1;
+float Mea_Vel_x_err = 0.1;
+float Mea_Vel_y_err = 0.1;
+float Pro_Pos_x_err = 1;
+float Pro_Pos_y_err = 1;
 float sum;
 float Four_Four_temp_00[16];
 float Four_Four_temp_11[16];
@@ -190,7 +190,7 @@ float Four_Four_temp_11[16];
 
 float X_now_1[4][1]=
 {
-    {100},
+    {0},
     {0},
     {0},
     {0}
@@ -435,7 +435,7 @@ int radar_estimator(double Pos_x, double Pos_y, double Vel_x, double Vel_y)
     Y_mea[0][0] = Pos_x;
     Y_mea[1][0] = Pos_y;
     Y_mea[2][0] = Vel_x;
-    Y_mea[2][0] = Vel_y;
+    Y_mea[3][0] = Vel_y;
 
     for(int c=0; c<4; c++){
         for(int d=0; d<1; d++){
@@ -816,7 +816,7 @@ int main(int argc, char *argv[])
 					posMsg.point.z = 0.0;
 					pos0Pub.publish(posMsg);
 
-					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][2] , object_list[last_track_ID_index][1], object_list[last_track_ID_index][3]);
+					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], object_list[last_track_ID_index][3]);
 
 					pos1Msg.header.stamp = ros::Time::now();
 					pos1Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;

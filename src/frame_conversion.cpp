@@ -5,22 +5,22 @@
  */
 
 #include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <mavros_msgs/State.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+//#include <mavros_msgs/State.h>
 #include <sensor_msgs/Imu.h>
-
-mavros_msgs::State current_state;
-sensor_msgs::Imu current_imu;
+#include <geometry_msgs/PointStamped.h>
 
 using namespace std;
 
-void state_cb(const mavros_msgs::State::ConstPtr& msg){
-    current_state = *msg;
-}
+//mavros_msgs::State current_state;
+sensor_msgs::Imu current_imu;
+geometry_msgs::PointStamped current_targetposMsg;
+geometry_msgs::PoseWithCovarianceStamped current_pose;
 
-void imu_cb(const sensor_msgs::Imu::ConstPtr& msg){
-    current_imu = *msg;
-}
+//void state_cb(const mavros_msgs::State::ConstPtr& msg){
+//    current_state = *msg;
+//}
+
 
 double toEulerAngle(double q_w, double q_x, double q_y, double q_z)
 {
@@ -55,16 +55,34 @@ double frame_conversion_yaw_y(double input_yaw,double input_x, double input_y)
   return input_x * sin(input_yaw) + input_y * cos(input_yaw);
 }
 
+void posestamped_cb(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
+    current_pose = *msg;
+}
+
+void imu_cb(const sensor_msgs::Imu::ConstPtr& msg){
+    current_imu = *msg;
+}
+
+void pointstamped_cb(const geometry_msgs::PointStamped::ConstPtr& msg){
+    current_targetposMsg = *msg;
+}
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "offb_node");
     ros::NodeHandle nh;
 
-    ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
-            ("mavros/state", 10, state_cb);
+//    ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
+//            ("mavros/state", 10, state_cb);
+
     ros::Subscriber imu_sub = nh.subscribe<sensor_msgs::Imu>
             ("mavros/imu/data", 10, imu_cb);
+
+    ros::Subscriber pointstamped_sub = nh.subscribe<geometry_msgs::PointStamped>
+            ("serial_ti_radar_read/radar_info0", 10, pointstamped_cb);
+
+    ros::Subscriber posestamped_sub = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>
+            ("mavros/global_position/local", 10, posestamped_cb);
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
@@ -73,20 +91,25 @@ int main(int argc, char **argv)
 
     double yaw_angle;
     double pos_x, pos_y;
-    double posX = 1;
-    double posY = 0;
+    double posX, posY;
 
     while(ros::ok()){
-//        cout<<current_state<<endl;
-//        cout<<current_imu.orientation<<endl<<endl;
-//        cout<<current_imu.orientation.x<<endl<<endl;
-        
+
         yaw_angle = toEulerAngle(current_imu.orientation.w, current_imu.orientation.x,current_imu.orientation.y,current_imu.orientation.z);
-        printf("yaw:   %lf       ", yaw_angle * 180/ 3.1415926);
+//        printf("yaw:   %lf       ", yaw_angle * 180/ 3.1415926);
         
+        posX = 0 - current_targetposMsg.point.x;
+        posY = current_targetposMsg.point.y;
         pos_x = frame_conversion_yaw_x(yaw_angle, posX, posY);
         pos_y = frame_conversion_yaw_y(yaw_angle, posX, posY);
-        printf("x = %lf    y = %lf    \n", pos_x, pos_y);
+//        printf("x = %lf    y = %lf    \n", pos_x, pos_y);
+
+//        printf("\n\nx = %lf    y = %lf    \n\n", current_targetposMsg.point.x, current_targetposMsg.point.y);
+
+        
+        printf("\n\nx = %lf    y = %lf    ", current_pose.pose.pose.position.x, current_pose.pose.pose.position.y);
+        printf("x = %lf    y = %lf    ", current_pose.pose.pose.position.x + pos_x, current_pose.pose.pose.position.y + pos_y);
+
         ros::spinOnce();
         rate.sleep();
     }

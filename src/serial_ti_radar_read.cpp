@@ -823,7 +823,7 @@ int main(int argc, char *argv[])
 					pos1Msg.point.x = Est_Target_Position_x;
 					pos1Msg.point.y = Est_Target_Position_y;
 					pos1Msg.point.z = 0.0;
-					pos1Pub.publish(pos1Msg);
+//					pos1Pub.publish(pos1Msg);
 				
 				}
 

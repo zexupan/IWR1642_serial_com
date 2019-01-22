@@ -96,12 +96,13 @@ int main(int argc, char **argv)
     while(ros::ok()){
 
         yaw_angle = toEulerAngle(current_imu.orientation.w, current_imu.orientation.x,current_imu.orientation.y,current_imu.orientation.z);
-//        printf("yaw:   %lf       ", yaw_angle * 180/ 3.1415926);
+        printf("yaw:   %lf       ", yaw_angle * 180/ 3.1415926);
         
         posX = 0 - current_targetposMsg.point.x;
         posY = current_targetposMsg.point.y;
         pos_x = frame_conversion_yaw_x(yaw_angle, posX, posY);
         pos_y = frame_conversion_yaw_y(yaw_angle, posX, posY);
+
 //        printf("x = %lf    y = %lf    \n", pos_x, pos_y);
 
 //        printf("\n\nx = %lf    y = %lf    \n\n", current_targetposMsg.point.x, current_targetposMsg.point.y);

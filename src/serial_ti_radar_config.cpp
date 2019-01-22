@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 	string lineread;
 	string readline;
 	int counter = 0;
-	ifstream myfile("/home/pzx/drones/src/serial_ti_radar/src/mmw_pplcount_demo_0.cfg");
+	ifstream myfile("/home/uav/catkin_ws/src/serial_ti_radar/src/mmw_pplcount_demo_0.cfg");
 
   	if (myfile.is_open()) 
     {

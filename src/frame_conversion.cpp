@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 
         
         printf("\n\nx = %lf    y = %lf    ", current_droneposMsg.pose.position.x, current_droneposMsg.pose.position.y);
-        printf("x = %lf    y = %lf    ", posX, posY);
+        printf("x = %lf    y = %lf    ", current_droneposMsg.pose.position.x + pos_x, current_droneposMsg.pose.position.y + pos_y);
 
         ros::spinOnce();
         rate.sleep();

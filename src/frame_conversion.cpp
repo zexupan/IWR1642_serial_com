@@ -5,18 +5,18 @@
  */
 
 #include <ros/ros.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
+//#include <geometry_msgs/PoseWithCovarianceStamped.h>
 //#include <mavros_msgs/State.h>
-#include <sensor_msgs/Imu.h>
+//#include <sensor_msgs/Imu.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 
 using namespace std;
 
 //mavros_msgs::State current_state;
-sensor_msgs::Imu current_imu;
+//sensor_msgs::Imu current_imu;
 geometry_msgs::PointStamped current_targetposMsg;
-geometry_msgs::PoseWithCovarianceStamped current_pose;
+//geometry_msgs::PoseWithCovarianceStamped current_pose;
 geometry_msgs::PoseStamped current_droneposMsg;
 
 //void state_cb(const mavros_msgs::State::ConstPtr& msg){
@@ -57,17 +57,17 @@ double frame_conversion_yaw_y(double input_yaw,double input_x, double input_y)
   return input_x * sin(input_yaw) + input_y * cos(input_yaw);
 }
 
-void posewithcovariancestamped_cb(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
-    current_pose = *msg;
-}
+//void posewithcovariancestamped_cb(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
+//    current_pose = *msg;
+//}
 
 void posestamped_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
     current_droneposMsg = *msg;
 }
 
-void imu_cb(const sensor_msgs::Imu::ConstPtr& msg){
-    current_imu = *msg;
-}
+//void imu_cb(const sensor_msgs::Imu::ConstPtr& msg){
+//    current_imu = *msg;
+//}
 
 void pointstamped_cb(const geometry_msgs::PointStamped::ConstPtr& msg){
     current_targetposMsg = *msg;
@@ -81,14 +81,14 @@ int main(int argc, char **argv)
 //    ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
 //            ("mavros/state", 10, state_cb);
 
-    ros::Subscriber imu_sub = nh.subscribe<sensor_msgs::Imu>
-            ("mavros/imu/data", 10, imu_cb);
+//    ros::Subscriber imu_sub = nh.subscribe<sensor_msgs::Imu>
+//            ("mavros/imu/data", 10, imu_cb);
 
     ros::Subscriber pointstamped_sub = nh.subscribe<geometry_msgs::PointStamped>
             ("serial_ti_radar_read/radar_info0", 10, pointstamped_cb);
 
-    ros::Subscriber posewithcovariancestamped_sub = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>
-            ("mavros/global_position/local", 10, posewithcovariancestamped_cb);
+//    ros::Subscriber posewithcovariancestamped_sub = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>
+//            ("mavros/global_position/local", 10, posewithcovariancestamped_cb);
 
     ros::Subscriber posestamped_sub = nh.subscribe<geometry_msgs::PoseStamped>
             ("mavros/local_position/pose", 10, posestamped_cb);
@@ -107,8 +107,8 @@ int main(int argc, char **argv)
         yaw_angle = toEulerAngle(current_droneposMsg.pose.orientation.w, current_droneposMsg.pose.orientation.x, current_droneposMsg.pose.orientation.y, current_droneposMsg.pose.orientation.z);//(current_imu.orientation.w, current_imu.orientation.x,current_imu.orientation.y,current_imu.orientation.z);
         printf("yaw:   %lf       ", yaw_angle * 180/ 3.1415926);
         
-        posX = 0 - current_targetposMsg.point.x;
-        posY = current_targetposMsg.point.y;
+        posX = current_targetposMsg.point.y;
+        posY = current_targetposMsg.point.x;
         pos_x = frame_conversion_yaw_x(yaw_angle, posX, posY);
         pos_y = frame_conversion_yaw_y(yaw_angle, posX, posY);
 
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 
         
         printf("\n\nx = %lf    y = %lf    ", current_droneposMsg.pose.position.x, current_droneposMsg.pose.position.y);
-        printf("x = %lf    y = %lf    ", current_pose.pose.pose.position.x + pos_x, current_pose.pose.pose.position.y + pos_y);
+        printf("x = %lf    y = %lf    ", posX, posY);
 
         ros::spinOnce();
         rate.sleep();

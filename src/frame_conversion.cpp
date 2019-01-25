@@ -5,9 +5,10 @@
  */
 
 #include <ros/ros.h>
+#include <math.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseStamped.h>
-
+#include <geometry_msgs/Twist.h>
 
 //#include <mavros_msgs/State.h>
 //#include <sensor_msgs/Imu.h>
@@ -22,6 +23,9 @@ geometry_msgs::PoseStamped current_droneposMsg;
 
 geometry_msgs::PointStamped posMsg;
 geometry_msgs::PointStamped pos1Msg;
+
+geometry_msgs::Twist cmd_vel;
+
 
 
 double toEulerAngle(double q_w, double q_x, double q_y, double q_z)
@@ -97,6 +101,8 @@ int main(int argc, char **argv)
     ros::Publisher pos0Pub = nh.advertise<geometry_msgs::PointStamped>("drone_local_position", 1000);
     ros::Publisher pos1Pub = nh.advertise<geometry_msgs::PointStamped>("radar_target_position", 1000);
 
+    ros::Publisher cmdpub = nh.advertise<geometry_msgs::Twist>("mavros/setpoint_velocity/cmd_vel_unstamped", 1000);
+
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
 
@@ -106,11 +112,13 @@ int main(int argc, char **argv)
     double pos_x, pos_y; //radar target position in loacl enu frame
     double posX, posY; //radar target position in drone body frame
     double drone_posx, drone_posy; //drone local position
+    double yaw_angle_diff;
+    double P_yaw = 0.25;
 
     while(ros::ok()){
 
         yaw_angle = toEulerAngle(current_droneposMsg.pose.orientation.w, current_droneposMsg.pose.orientation.x, current_droneposMsg.pose.orientation.y, current_droneposMsg.pose.orientation.z);//(current_imu.orientation.w, current_imu.orientation.x,current_imu.orientation.y,current_imu.orientation.z);
-        printf("yaw:   %lf       ", yaw_angle * 180/ 3.1415926);
+//        printf("yaw:   %lf       ", yaw_angle * 180/ 3.1415926);
         
         //sensor frame to drone body frame transformation
         posX = current_targetposMsg.point.y;
@@ -120,12 +128,46 @@ int main(int argc, char **argv)
         drone_posx = current_droneposMsg.pose.position.x;
         drone_posy = current_droneposMsg.pose.position.y;
 
+        yaw_angle_diff = atan(posY / posX);
+
         //radar target position in loacl enu frame
         pos_x = drone_posx+ frame_conversion_yaw_x(yaw_angle, posX, posY);
         pos_y = drone_posy + frame_conversion_yaw_y(yaw_angle, posX, posY);
  
-        printf("\n\nx = %lf    y = %lf    ", drone_posx, drone_posy);
-        printf("x = %lf    y = %lf    ", pos_x, pos_y);
+
+
+        cmd_vel.linear.x = 0;
+        cmd_vel.linear.y = 0;
+        cmd_vel.linear.z = 0;
+        cmd_vel.angular.x = 0;
+        cmd_vel.angular.y = 0;
+
+        double temp_angle;
+        temp_angle = P_yaw * yaw_angle_diff;
+
+        if (yaw_angle_diff < 0.0349066 && yaw_angle_diff > -0.0349066) //if target angle less than 2 degrees,ignore yaw rate
+        {
+          temp_angle = 0;
+        }
+
+        if (temp_angle > 0.174533) //set max yaw rate to 10 degrees/s
+        {
+          temp_angle = 0.174533;
+        }
+
+        if (temp_angle < -0.174533) //set max yaw rate to 10 degrees/s
+        {
+          temp_angle = -0.174533;
+        }
+
+        cmd_vel.angular.z = temp_angle;
+        cmdpub.publish(cmd_vel);
+
+        printf("\n\nx = %lf    y = %lf    ", posX, posY);
+//        printf("x = %lf    y = %lf    ", pos_x, pos_y);
+        printf("yaw diff = %lf  ", yaw_angle_diff * 180/ 3.1415926);
+        printf("yaw rate command = %lf ", temp_angle * 180/ 3.1415926);
+
 
         posMsg.header.stamp = ros::Time::now();
         posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;

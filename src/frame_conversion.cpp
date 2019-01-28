@@ -204,9 +204,9 @@ int main(int argc, char **argv)
         cmdpub.publish(cmd_vel);
 
         printf("\n\nx = %lf    y = %lf    ", posX, posY);
-//        printf("x = %lf    y = %lf    ", pos_x, pos_y);
-        printf("yaw diff = %lf  ", yaw_angle_diff * 180/ 3.1415926);
-        printf("yaw rate command = %lf ", temp_angle * 180/ 3.1415926);
+        printf("x = %lf    y = %lf    ", target_pos_x, target_pos_y);
+//        printf("yaw diff = %lf  ", yaw_angle_diff * 180/ 3.1415926);
+//        printf("yaw rate command = %lf ", temp_angle * 180/ 3.1415926);
 
 
         posMsg.header.stamp = ros::Time::now();

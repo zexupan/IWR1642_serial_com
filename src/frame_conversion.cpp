@@ -143,12 +143,12 @@ int main(int argc, char **argv)
         
 
         double temp_pos_x;
-        if (temp_pos_x > 0)
+        if (target_pos_x > 0)
         {
           temp_pos_x = P_pos_x * sqrt(abs(target_pos_x -1.5));
         }
 
-        if (temp_pos_x <= 0)
+        if (target_pos_x <= 0)
         {
           temp_pos_x = -P_pos_x * sqrt(abs(target_pos_x +1.5));
         }
@@ -170,11 +170,11 @@ int main(int argc, char **argv)
         cmd_vel.linear.x = temp_pos_x;
 
         double temp_pos_y;
-        if (temp_pos_y > 0)
+        if (target_pos_y > 0)
         {
           temp_pos_y = P_pos_y * sqrt(abs(target_pos_y -1.5));
         }
-        if (temp_pos_y < 0)
+        if (target_pos_y < 0)
         {
           temp_pos_y = -P_pos_y * sqrt(abs(target_pos_y +1.5));
         }

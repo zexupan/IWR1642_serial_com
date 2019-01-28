@@ -143,27 +143,37 @@ int main(int argc, char **argv)
         
 
         double temp_pos_x;
-        if (target_pos_x <= 1)
+        temp_pos_x = P_pos_x * sqrt(target_pos_x -1);
+
+        if (target_pos_x <= 1 && target_pos_x >= -1)
         {
           temp_pos_x = 0;
         }
-        temp_pos_x = P_pos_x * sqrt(target_pos_x -1);
         if (temp_pos_x > 5)
         {
           temp_pos_x = 5;
+        }
+        if (temp_pos_x < -5)
+        {
+          temp_pos_x = -5;
         }
 
         cmd_vel.linear.x = temp_pos_x;
 
         double temp_pos_y;
-        if (target_pos_y <= 1)
+        temp_pos_y = P_pos_y * sqrt(target_pos_y -1);
+
+        if (target_pos_y <= 1 && target_pos_y >= -1)
         {
           temp_pos_y = 0;
         }
-        temp_pos_y = P_pos_y * sqrt(target_pos_y -1);
         if (temp_pos_y > 5)
         {
           temp_pos_y = 5;
+        }
+        if (temp_pos_y < -5)
+        {
+          temp_pos_y = -5;
         }
 
         cmd_vel.linear.y = temp_pos_y;

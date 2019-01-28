@@ -112,8 +112,10 @@ int main(int argc, char **argv)
     double pos_x, pos_y; //radar target position in loacl enu frame
     double posX, posY; //radar target position in drone body frame
     double drone_posx, drone_posy; //drone local position
+    double target_pos_x, target_pos_y;
     double yaw_angle_diff;
     double P_yaw = 1;
+    double P_pos_x = 1;
 
     while(ros::ok()){
 
@@ -131,17 +133,32 @@ int main(int argc, char **argv)
         yaw_angle_diff = atan(posY / posX);
 
         //radar target position in loacl enu frame
-        pos_x = drone_posx+ frame_conversion_yaw_x(yaw_angle, posX, posY);
-        pos_y = drone_posy + frame_conversion_yaw_y(yaw_angle, posX, posY);
+        target_pos_x = frame_conversion_yaw_x(yaw_angle, posX, posY);
+        target_pos_y = frame_conversion_yaw_y(yaw_angle, posX, posY);
+        pos_x = drone_posx+ target_pos_x; 
+        pos_y = drone_posy + target_pos_y;
  
 
+        
 
-        cmd_vel.linear.x = 0;
+        double temp_pos_x;
+        if (target_pos_x <= 1)
+        {
+          temp_pos_x = 0;
+        }
+        temp_pos_x = P_pos_x * sqrt(target_pos_x -1);
+        if (temp_pos_x > 5)
+        {
+          temp_pos_x = 5;
+        }
+
+        cmd_vel.linear.x = temp_pos_x;
         cmd_vel.linear.y = 0;
         cmd_vel.linear.z = 0;
         cmd_vel.angular.x = 0;
         cmd_vel.angular.y = 0;
 
+        //align yaw 
         double temp_angle;
         temp_angle = P_yaw * yaw_angle_diff;
 
@@ -150,12 +167,12 @@ int main(int argc, char **argv)
           temp_angle = 0;
         }
 
-        if (temp_angle > 0.5236) //set max yaw rate to 10 degrees/s
+        if (temp_angle > 0.5236) //set max yaw rate to 30 degrees/s
         {
           temp_angle = 0.5236;
         }
 
-        if (temp_angle < -0.5236) //set max yaw rate to 10 degrees/s
+        if (temp_angle < -0.5236) //set max yaw rate to 30 degrees/s
         {
           temp_angle = -0.5236;
         }

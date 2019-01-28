@@ -116,6 +116,7 @@ int main(int argc, char **argv)
     double yaw_angle_diff;
     double P_yaw = 1;
     double P_pos_x = 1;
+    double P_pos_y = 1;
 
     while(ros::ok()){
 
@@ -153,7 +154,19 @@ int main(int argc, char **argv)
         }
 
         cmd_vel.linear.x = temp_pos_x;
-        cmd_vel.linear.y = 0;
+
+        double temp_pos_y;
+        if (target_pos_y <= 1)
+        {
+          temp_pos_y = 0;
+        }
+        temp_pos_y = P_pos_y * sqrt(target_pos_y -1);
+        if (temp_pos_y > 5)
+        {
+          temp_pos_y = 5;
+        }
+
+        cmd_vel.linear.y = temp_pos_y;
         cmd_vel.linear.z = 0;
         cmd_vel.angular.x = 0;
         cmd_vel.angular.y = 0;

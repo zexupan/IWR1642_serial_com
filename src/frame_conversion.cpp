@@ -115,7 +115,7 @@ int main(int argc, char **argv)
     double target_pos_x, target_pos_y;
     double yaw_angle_diff;
     double P_yaw = 1;
-    double P_pos = 0.25;
+    double P_pos = 0.5;
 
 
     while(ros::ok()){

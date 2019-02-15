@@ -141,23 +141,28 @@ int main(int argc, char **argv)
  
 
         
-
+        // x axis pursuit
         double temp_pos_x;
-        if (target_pos_x > 0)
+
+
+        if (target_pos_x > 1.5)
         {
           temp_pos_x = P_pos * sqrt(abs(target_pos_x -1.5));
         }
-
-        if (target_pos_x <= 0)
+        else if (target_pos_x < - 1.5)
         {
           temp_pos_x = -P_pos * sqrt(abs(target_pos_x +1.5));
         }
-        
-
-        if (target_pos_x <= 1.5 && target_pos_x >= -1.5)
+        else if (target_pos_x >= 0 && target_pos_x <= 1.5)
         {
-          temp_pos_x = 0;
+          temp_pos_x = P_pos * (target_pos_x - 1.5);
         }
+        else if (target_pos_x < 0 && target_pos_x >= -1.5)
+        {
+          temp_pos_x = P_pos * (target_pos_x + 1.5);
+        }
+
+
         if (temp_pos_x > 5)
         {
           temp_pos_x = 5;
@@ -169,22 +174,27 @@ int main(int argc, char **argv)
 
         cmd_vel.linear.x = temp_pos_x;
 
+        //y axis pursuit
         double temp_pos_y;
-        if (target_pos_y > 0)
+
+        if (target_pos_y > 1.5)
         {
           temp_pos_y = P_pos * sqrt(abs(target_pos_y -1.5));
         }
-        if (target_pos_y < 0)
+        else if (target_pos_y < - 1.5)
         {
           temp_pos_y = -P_pos * sqrt(abs(target_pos_y +1.5));
         }
-        
-        
-
-        if (target_pos_y <= 1.5 && target_pos_y >= -1.5)
+        else if (target_pos_y >= 0 && target_pos_y <= 1.5)
         {
-          temp_pos_y = 0;
+          temp_pos_y = P_pos * (target_pos_y - 1.5);
         }
+        else if (target_pos_y < 0 && target_pos_y >= -1.5)
+        {
+          temp_pos_y = P_pos * (target_pos_y + 1.5);
+        }
+
+
         if (temp_pos_y > 5)
         {
           temp_pos_y = 5;

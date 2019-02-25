@@ -809,6 +809,8 @@ int main(int argc, char *argv[])
 						last_track_ID_index = object_list_index_counter[0];
 					}
 
+                    printf("x = %lf ", object_list[last_track_ID_index][0]);
+                    printf("   y = %lf \n", object_list[last_track_ID_index][1]);
 					posMsg.header.stamp = ros::Time::now();
 					posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
 					posMsg.point.x = object_list[last_track_ID_index][0];

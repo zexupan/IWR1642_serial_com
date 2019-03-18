@@ -259,7 +259,7 @@ int main(int argc, char **argv)
         pos2Msg.point.x = posX;
         pos2Msg.point.y = posY;
         pos2Msg.point.z = sqrt(posX*posX + posY*posY);
-        pos2Pub.publish(po2sMsg);
+        pos2Pub.publish(pos2Msg);
 
 
 

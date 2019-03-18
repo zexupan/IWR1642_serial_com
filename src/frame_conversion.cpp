@@ -256,9 +256,9 @@ int main(int argc, char **argv)
 
         pos2Msg.header.stamp = ros::Time::now();
         pos2Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-        pos2Msg.point.x = posX;
-        pos2Msg.point.y = posY;
-        pos2Msg.point.z = sqrt(posX*posX + posY*posY);
+        pos2Msg.point.x = sqrt(posX*posX + posY*posY);
+        pos2Msg.point.y = atan(posY/posX) *180/3.1415926;
+        pos2Msg.point.z = 0;
         pos2Pub.publish(pos2Msg);
 
 

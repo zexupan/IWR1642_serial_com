@@ -23,6 +23,7 @@ geometry_msgs::PoseStamped current_droneposMsg;
 
 geometry_msgs::PointStamped posMsg;
 geometry_msgs::PointStamped pos1Msg;
+geometry_msgs::PointStamped pos2Msg;
 
 geometry_msgs::Twist cmd_vel;
 
@@ -100,6 +101,8 @@ int main(int argc, char **argv)
 
     ros::Publisher pos0Pub = nh.advertise<geometry_msgs::PointStamped>("drone_local_position", 1000);
     ros::Publisher pos1Pub = nh.advertise<geometry_msgs::PointStamped>("radar_target_position", 1000);
+
+    ros::Publisher pos2Pub = nh.advertise<geometry_msgs::PointStamped>("radar_info_log", 1000);
 
     ros::Publisher cmdpub = nh.advertise<geometry_msgs::Twist>("mavros/setpoint_velocity/cmd_vel_unstamped", 1000);
 
@@ -250,6 +253,15 @@ int main(int argc, char **argv)
         pos1Msg.point.y = pos_y;
         pos1Msg.point.z = 0.0;
         pos1Pub.publish(pos1Msg);
+
+        pos2Msg.header.stamp = ros::Time::now();
+        pos2Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+        pos2Msg.point.x = posX;
+        pos2Msg.point.y = posY;
+        pos2Msg.point.z = sqrt(posX*posX + posY*posY);
+        pos2Pub.publish(po2sMsg);
+
+
 
         ros::spinOnce();
         rate.sleep();

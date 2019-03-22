@@ -821,8 +821,8 @@ int main(int argc, char *argv[])
                     printf("   y = %lf \n", object_list[last_track_ID_index][1]);
 					posMsg.header.stamp = ros::Time::now();
 					posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-					posMsg.point.x = distance;//object_list[last_track_ID_index][0];
-					posMsg.point.y = angle*180/3.1415926;//object_list[last_track_ID_index][1];
+					posMsg.point.x = object_list[last_track_ID_index][0];
+					posMsg.point.y = object_list[last_track_ID_index][1];
 					posMsg.point.z = 0.0;
 					pos0Pub.publish(posMsg);
 

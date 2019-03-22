@@ -117,7 +117,7 @@ int main(int argc, char **argv)
     double drone_posx, drone_posy; //drone local position
     double target_pos_x, target_pos_y;
     double yaw_angle_diff;
-    double P_yaw = 1.5;
+    double P_yaw = 1;
     double P_pos = 0.5;
 
 

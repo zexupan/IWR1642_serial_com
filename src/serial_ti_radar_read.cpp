@@ -826,7 +826,7 @@ int main(int argc, char *argv[])
                     distance = sqrt(object_list[last_track_ID_index][0]*object_list[last_track_ID_index][0]+object_list[last_track_ID_index][1]*object_list[last_track_ID_index][1]);
                     speed = object_list[last_track_ID_index][2]*sin(angle) + object_list[last_track_ID_index][3]*cos(angle);
 //					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], object_list[last_track_ID_index][3]);
-                    radar_estimator(distance, angle , speed, 0);
+                    radar_estimator(distance, angle*180/3.1415926 , speed, 0);
 
 
 					pos1Msg.header.stamp = ros::Time::now();

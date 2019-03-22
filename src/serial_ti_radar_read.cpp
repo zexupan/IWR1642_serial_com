@@ -600,6 +600,9 @@ int main(int argc, char *argv[])
 	int no_target;
 	int no_input_points;
 	int last_track_ID = 100;
+    float angle = 0;
+    float distance = 0;
+    float speed = 0;
 	
 
 	while(ros::ok())
@@ -818,8 +821,12 @@ int main(int argc, char *argv[])
 					posMsg.point.z = 0.0;
 					pos0Pub.publish(posMsg);
 
+
+                    angle = atan(object_list[last_track_ID_index][0]/object_list[last_track_ID_index][1]);
+                    distance = sqrt(object_list[last_track_ID_index][0]*object_list[last_track_ID_index][0]+object_list[last_track_ID_index][1]*object_list[last_track_ID_index][1]);
+                    speed = object_list[last_track_ID_index][2]*sin(angle) + object_list[last_track_ID_index][3]*cos(angle);
 //					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], object_list[last_track_ID_index][3]);
-                    radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], 0);
+                    radar_estimator(distance, angle , speed, 0);
 
 
 					pos1Msg.header.stamp = ros::Time::now();

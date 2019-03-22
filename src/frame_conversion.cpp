@@ -117,7 +117,7 @@ int main(int argc, char **argv)
     double drone_posx, drone_posy; //drone local position
     double target_pos_x, target_pos_y;
     double yaw_angle_diff;
-    double P_yaw = 1;
+    double P_yaw = 1.5;
     double P_pos = 0.5;
 
 
@@ -221,14 +221,14 @@ int main(int argc, char **argv)
           temp_angle = 0;
         }
 
-        if (temp_angle > 0.5236) //set max yaw rate to 30 degrees/s
+        if (temp_angle > 0.7854) //set max yaw rate to 45 degrees/s
         {
-          temp_angle = 0.5236;
+          temp_angle = 0.7854;
         }
 
-        if (temp_angle < -0.5236) //set max yaw rate to 30 degrees/s
+        if (temp_angle < -0.7854) //set max yaw rate to 45 degrees/s
         {
-          temp_angle = -0.5236;
+          temp_angle = -0.7854;
         }
 
         cmd_vel.angular.z = temp_angle;

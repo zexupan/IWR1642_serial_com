@@ -180,8 +180,8 @@ float Mea_Pos_x_err = 0.5;
 float Mea_Pos_y_err = 0.5;
 float Mea_Vel_x_err = 0.5;
 float Mea_Vel_y_err = 0.5;
-float Pro_Pos_x_err = 1;
-float Pro_Pos_y_err = 1;
+float Pro_Pos_x_err = 5;
+float Pro_Pos_y_err = 5;
 float sum;
 float Four_Four_temp_00[16];
 float Four_Four_temp_11[16];
@@ -821,8 +821,8 @@ int main(int argc, char *argv[])
                     printf("   y = %lf \n", object_list[last_track_ID_index][1]);
 					posMsg.header.stamp = ros::Time::now();
 					posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-					posMsg.point.x = distance;
-					posMsg.point.y = angle*180/3.1415926;
+					posMsg.point.x = distance;//object_list[last_track_ID_index][0];
+					posMsg.point.y = angle//object_list[last_track_ID_index][1];
 					posMsg.point.z = 0.0;
 					pos0Pub.publish(posMsg);
 

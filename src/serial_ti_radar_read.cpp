@@ -818,14 +818,16 @@ int main(int argc, char *argv[])
 					posMsg.point.z = 0.0;
 					pos0Pub.publish(posMsg);
 
-					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], object_list[last_track_ID_index][3]);
+//					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], object_list[last_track_ID_index][3]);
+                    radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], 0);
+
 
 					pos1Msg.header.stamp = ros::Time::now();
 					pos1Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
 					pos1Msg.point.x = Est_Target_Position_x;
 					pos1Msg.point.y = Est_Target_Position_y;
 					pos1Msg.point.z = 0.0;
-//					pos1Pub.publish(pos1Msg);
+					pos1Pub.publish(pos1Msg);
 				
 				}
 

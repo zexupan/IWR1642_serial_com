@@ -254,6 +254,8 @@ int main(int argc, char **argv)
         pos1Msg.point.z = 0.0;
         pos1Pub.publish(pos1Msg);
 
+
+        //output the target distance and angle information relative to the drone
         pos2Msg.header.stamp = ros::Time::now();
         pos2Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
         pos2Msg.point.x = sqrt(posX*posX + posY*posY);

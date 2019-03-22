@@ -627,7 +627,7 @@ int main(int argc, char *argv[])
 			//Header is found, sync back
 			if (n == 8)
 			{
-//				printf("found frame header, exit lostsync while loop\n");
+				printf("found frame header, exit lostsync while loop\n");
 				lostsync = 0;
 				//read header, 52-8 bytes
 				for (int i = 8; i < 52; i++ )

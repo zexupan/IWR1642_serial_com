@@ -834,8 +834,8 @@ int main(int argc, char *argv[])
 
 					pos1Msg.header.stamp = ros::Time::now();
 					pos1Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-					pos1Msg.point.x = Est_Target_Position_x;
-					pos1Msg.point.y = Est_Target_Position_y;
+					pos1Msg.point.x = distance;
+					pos1Msg.point.y = angle;
 					pos1Msg.point.z = 0.0;
 					pos1Pub.publish(pos1Msg);
 				

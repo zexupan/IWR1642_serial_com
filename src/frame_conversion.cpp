@@ -118,7 +118,7 @@ int main(int argc, char **argv)
     double target_pos_x, target_pos_y;
     double yaw_angle_diff;
     double P_yaw = 1;
-    double P_pos = 0.5;
+    double P_pos = 1;
 
 
     while(ros::ok()){
@@ -150,11 +150,11 @@ int main(int argc, char **argv)
 
         if (target_pos_x > 1.5)
         {
-          temp_pos_x = P_pos * sqrt(abs(target_pos_x -1.5));
+          temp_pos_x = P_pos * abs(target_pos_x -1.5);
         }
         else if (target_pos_x < - 1.5)
         {
-          temp_pos_x = -P_pos * sqrt(abs(target_pos_x +1.5));
+          temp_pos_x = -P_pos * abs(target_pos_x +1.5);
         }
         else if (target_pos_x >= 0 && target_pos_x <= 1.5)
         {
@@ -182,11 +182,11 @@ int main(int argc, char **argv)
 
         if (target_pos_y > 1.5)
         {
-          temp_pos_y = P_pos * sqrt(abs(target_pos_y -1.5));
+          temp_pos_y = P_pos * abs(target_pos_y -1.5);
         }
         else if (target_pos_y < - 1.5)
         {
-          temp_pos_y = -P_pos * sqrt(abs(target_pos_y +1.5));
+          temp_pos_y = -P_pos * abs(target_pos_y +1.5);
         }
         else if (target_pos_y >= 0 && target_pos_y <= 1.5)
         {

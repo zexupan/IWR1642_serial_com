@@ -839,15 +839,15 @@ int main(int argc, char *argv[])
 
 
 
-                    for (int i = 0; i < 8;; i++)
+                    for (int l = 0; l < 8; l++)
                     {
                         posMsg.header.stamp = ros::Time::now();
                         posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-                        posMsg.point.x = object_list[i][0];
-                        posMsg.point.y = object_list[i][1];
-                        posMsg.point.z = object_list_index[i];
+                        posMsg.point.x = object_list[l][0];
+                        posMsg.point.y = object_list[l][1];
+                        posMsg.point.z = object_list_index[l];
 
-                        switch(i){
+                        switch(l){
                             case 0: pos0Pub.publish(posMsg);
 
                             case 1: pos1Pub.publish(posMsg);
@@ -894,9 +894,9 @@ int main(int argc, char *argv[])
 
                     if (no_of_objects < 8)
                     {
-                        for (int i = no_of_objects; i < 8;; i++)
+                        for (int l = no_of_objects; l < 8; l++)
                         {
-                            switch(i){
+                            switch(l){
                                 case 0: pos0Pub.publish(posMsg);
 
                                 case 1: pos1Pub.publish(posMsg);

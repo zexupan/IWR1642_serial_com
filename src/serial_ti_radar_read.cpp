@@ -823,7 +823,7 @@ int main(int argc, char *argv[])
 					posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
 					posMsg.point.x = object_list[last_track_ID_index][0];
 					posMsg.point.y = object_list[last_track_ID_index][1];
-					posMsg.point.z = 0.0;
+					posMsg.point.z = object_list_index[last_track_ID_index];
 					pos0Pub.publish(posMsg);
 
 
@@ -831,7 +831,7 @@ int main(int argc, char *argv[])
 //					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], object_list[last_track_ID_index][3]);
                     radar_estimator(distance, angle*180/3.1415926 , speed, 0);
 
-
+                    
 					pos1Msg.header.stamp = ros::Time::now();
 					pos1Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
 					pos1Msg.point.x = distance;

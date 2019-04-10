@@ -36,7 +36,6 @@ double object_list_range[32];
 
 using namespace std;
 geometry_msgs::PointStamped posMsg;
-geometry_msgs::PointStamped pos1Msg;
 
 
 bool inverse4x4(float m[],float invOut[])
@@ -575,8 +574,15 @@ int main(int argc, char *argv[])
 
 	ros::Rate rate(20);
 
+    ros::Publisher posPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info", 1000);
 	ros::Publisher pos0Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info0", 1000);
 	ros::Publisher pos1Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1", 1000);
+    ros::Publisher pos2Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info2", 1000);
+    ros::Publisher pos3Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info3", 1000);
+    ros::Publisher pos4Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info4", 1000);
+    ros::Publisher pos5Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info5", 1000);
+    ros::Publisher pos6Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info6", 1000);
+    ros::Publisher pos7Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info7", 1000);
 
 
 	int lostsync = 1;
@@ -824,20 +830,92 @@ int main(int argc, char *argv[])
 					posMsg.point.x = object_list[last_track_ID_index][0];
 					posMsg.point.y = object_list[last_track_ID_index][1];
 					posMsg.point.z = object_list_index[last_track_ID_index];
-					pos0Pub.publish(posMsg);
+					posPub.publish(posMsg);
 
 
-                    
-//					radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], object_list[last_track_ID_index][3]);
-                    radar_estimator(distance, angle*180/3.1415926 , speed, 0);
+                    //kalman filter
+					//radar_estimator(object_list[last_track_ID_index][0],object_list[last_track_ID_index][1] , object_list[last_track_ID_index][2], object_list[last_track_ID_index][3]);
+                    //radar_estimator(distance, angle*180/3.1415926 , speed, 0);
 
-                    
-					pos1Msg.header.stamp = ros::Time::now();
-					pos1Msg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-					pos1Msg.point.x = distance;
-					pos1Msg.point.y = angle;
-					pos1Msg.point.z = 0.0;
-					pos1Pub.publish(pos1Msg);
+
+
+                    for (int i = 0; i < 8;; i++)
+                    {
+                        posMsg.header.stamp = ros::Time::now();
+                        posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+                        posMsg.point.x = object_list[i][0];
+                        posMsg.point.y = object_list[i][1];
+                        posMsg.point.z = object_list_index[i];
+
+                        switch(i){
+                            case 0: pos0Pub.publish(posMsg);
+
+                            case 1: pos1Pub.publish(posMsg);
+
+                            case 2: pos2Pub.publish(posMsg);
+
+                            case 3: pos3Pub.publish(posMsg);
+
+                            case 4: pos4Pub.publish(posMsg);
+
+                            case 5: pos5Pub.publish(posMsg);
+
+                            case 6: pos6Pub.publish(posMsg);
+
+                            case 7: pos7Pub.publish(posMsg);
+                        }
+                        
+                    }
+
+
+                    posMsg.header.stamp = ros::Time::now();
+                    posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+                    posMsg.point.x = 0;
+                    posMsg.point.y = 0;
+                    posMsg.point.z = 0;
+
+                    switch(last_track_ID_index){
+                        case 0: pos0Pub.publish(posMsg);
+
+                        case 1: pos1Pub.publish(posMsg);
+
+                        case 2: pos2Pub.publish(posMsg);
+
+                        case 3: pos3Pub.publish(posMsg);
+
+                        case 4: pos4Pub.publish(posMsg);
+
+                        case 5: pos5Pub.publish(posMsg);
+
+                        case 6: pos6Pub.publish(posMsg);
+
+                        case 7: pos7Pub.publish(posMsg);
+                    }
+
+                    if (no_of_objects < 8)
+                    {
+                        for (int i = no_of_objects; i < 8;; i++)
+                        {
+                            switch(i){
+                                case 0: pos0Pub.publish(posMsg);
+
+                                case 1: pos1Pub.publish(posMsg);
+
+                                case 2: pos2Pub.publish(posMsg);
+
+                                case 3: pos3Pub.publish(posMsg);
+
+                                case 4: pos4Pub.publish(posMsg);
+
+                                case 5: pos5Pub.publish(posMsg);
+
+                                case 6: pos6Pub.publish(posMsg);
+
+                                case 7: pos7Pub.publish(posMsg);
+                            }
+                            
+                        }
+                    }
 				
 				}
 

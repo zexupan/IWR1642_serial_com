@@ -5,8 +5,11 @@ serial_ti_radar
 This repo provides a serial communication driver for TI IWR1642 mmWave sensor. This ROS package sends config parameters to a TI IWR1642 mmwave radar sensor, and then retrieve data about detected targets and publish them in PosewithCovariance messages.
 This repo was tested in Ubuntu 16.04 and ROS kinetic.
 To get it working, the TI IWR1642 has to be installed with the people counting demo firmware (tested using the firmware provided in mmwave_industrial_toolbox_2_3_0 lab0011-pplcount).
+
 serial_ti_radar_config.cpp send the cfg command to the radar
+
 serial_ti_radar_read.cpp extracts the radar info
+
 frame_transformation.cpp UAV track and pursuit target in autonomous offboard mode
 
 Installing

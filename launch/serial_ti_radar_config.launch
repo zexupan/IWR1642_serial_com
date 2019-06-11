@@ -3,7 +3,8 @@
 
     <node pkg="serial_ti_radar" name="serial_ti_radar_config" type="serial_ti_radar_config" output="screen">
 	    <param name="serialPort" type="string" value="/dev/ttyACM0" />
+	    <param name="filePath" type="string" value="/home/uav/catkin_ws/src/serial_ti_radar/src/mmw_pplcount_demo_0.cfg" />	    
     </node>
-    <node name="radar_record" pkg="rosbag" type="record" args="-o $(find serial_radar)/bag/serial_radar_record /radarBAG"/>
-
+<!--     <node name="radar_record" pkg="rosbag" type="record" args="-o $(find serial_radar)/bag/serial_radar_record /radarBAG"/>
+ -->
 </launch>

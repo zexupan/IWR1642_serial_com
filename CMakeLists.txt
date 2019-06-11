@@ -12,7 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   serial
-  mavros
 )
 
 ## System dependencies are found with CMake's conventions

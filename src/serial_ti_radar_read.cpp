@@ -5,6 +5,8 @@
 #include <iostream>
 #include <math.h>
 #include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <tf/transform_datatypes.h>
 
 //define 5 different messages and the buffer
 uint8_t frame_header[52];
@@ -38,7 +40,8 @@ double object_list_range[32];
 
 using namespace std;
 geometry_msgs::PointStamped posMsg;
-
+geometry_msgs::PoseWithCovarianceStamped poseCorMsg;
+static tf::Quaternion q;
 string serialPort, serialPortConfig, filePath;
 void sendConfig();
 bool sentConfig = false;
@@ -53,24 +56,21 @@ int main(int argc, char *argv[])
 
 	if(serial_radar_nh.getParam("serialPort", serialPort))
 		printf("Retrived Port Name: %s\n", serialPort.data());
-	else
-	{
+	else{
 		printf("Cannot retrived Port name. Exit\n");
 		exit(-1);
 	}
 
     if(serial_radar_nh.getParam("serialPortConfig", serialPortConfig))
         printf("Retrived Config Port Name: %s\n", serialPortConfig.data());
-    else
-    {
+    else{
         printf("Cannot retrived Port name. Exit\n");
         exit(-1);
     }
 
     if(serial_radar_nh.getParam("filePath", filePath))
         printf("Retrived Config File Path: %s\n", filePath.data());
-    else
-    {
+    else{
         printf("Cannot Config File Path. Exit\n");
         exit(-1);
     } 
@@ -85,28 +85,26 @@ int main(int argc, char *argv[])
 	fd.setBaudrate(921600);
 	fd.setTimeout(5, 10, 2, 10, 2);
 	fd.open();
-	if (fd.isOpen())
-	{
+	if (fd.isOpen()){
 		fd.flushInput();
 		printf("Connection established\n\n");
 	}
-	else
-	{
+	else{
 		printf("serialInit: Failed to open port\n");
 		return 0;
 	}
 
 	ros::Rate rate(20);
 
-    ros::Publisher posPub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info", 1000);
-	ros::Publisher pos0Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info0", 1000);
-	ros::Publisher pos1Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info1", 1000);
-    ros::Publisher pos2Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info2", 1000);
-    ros::Publisher pos3Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info3", 1000);
-    ros::Publisher pos4Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info4", 1000);
-    ros::Publisher pos5Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info5", 1000);
-    ros::Publisher pos6Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info6", 1000);
-    ros::Publisher pos7Pub = serial_radar_nh.advertise<geometry_msgs::PointStamped>("radar_info7", 1000);
+    ros::Publisher posPub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info", 1000);
+	ros::Publisher pos0Pub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info0", 1000);
+	ros::Publisher pos1Pub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info1", 1000);
+    ros::Publisher pos2Pub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info2", 1000);
+    ros::Publisher pos3Pub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info3", 1000);
+    ros::Publisher pos4Pub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info4", 1000);
+    ros::Publisher pos5Pub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info5", 1000);
+    ros::Publisher pos6Pub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info6", 1000);
+    ros::Publisher pos7Pub = serial_radar_nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("radar_info7", 1000);
 
 
 	int lostsync = 1;
@@ -134,52 +132,43 @@ int main(int argc, char *argv[])
     float distance = 0;
     float speed = 0;
 	
+    q = tf::createQuaternionFromRPY(0, 3.1415927/2, 0);
+	while(ros::ok()){	
+    	while(lostsync){
+    		//Looking for sync data for the header
+    		int n = 0;
+    		while(n < 8){
+    			while(fd.available() <= 0);
+    			uint8_t temp_byte;
+    			fd.read(&temp_byte, 1);
+    			if(temp_byte == testsync[n]){
+    				frame_header[n] = temp_byte;
+    				n++;
+    			}
+    			else n = 0;
+    		}
 
-	while(ros::ok())
-	{	
-		while(lostsync)
-		{
-			//Looking for sync data for the header
-			int n = 0;
-			while(n < 8)
-			{
-				while(fd.available() <= 0);
-				uint8_t temp_byte;
-				fd.read(&temp_byte, 1);
-				if(temp_byte == testsync[n])
-				{
-					frame_header[n] = temp_byte;
-					n++;
-				}
-				else n = 0;
-			}
+    		//Header is found, sync back
+    		if (n == 8){
+    			printf("found frame header, exit lostsync while loop\n");
+    			lostsync = 0;
+    			//read header, 52-8 bytes
+    			for (int j = 8; j < 52; j++ ){
+    				while(fd.available() <= 0);
+    				uint8_t temp_byte;
+    				fd.read(&temp_byte, 1);
+    				frame_header[j] = temp_byte;
+    			}
+    		}
+    	}
 
-			//Header is found, sync back
-			if (n == 8)
-			{
-				printf("found frame header, exit lostsync while loop\n");
-				lostsync = 0;
-				//read header, 52-8 bytes
-				for (int i = 8; i < 52; i++ )
-				{
-					while(fd.available() <= 0);
-					uint8_t temp_byte;
-					fd.read(&temp_byte, 1);
-					frame_header[i] = temp_byte;
-				}
-			}
-		}
-
-		while(lostsync == 0)
-		{
+		while(lostsync == 0){
 			
-			if (frame_header_frame_number > target_frame_number)
-			{
+			if (frame_header_frame_number > target_frame_number){
 				target_frame_number = frame_header_frame_number;
 
 			}
-			else
-			{
+			else{
 				lostsync = 1; //old frame
 				break;
 			}
@@ -191,67 +180,60 @@ int main(int argc, char *argv[])
 			no_input_points = 0;
 			no_target = 0;
 
-//			for (int i = 0; i < 52; i++)
-//			{
-//				printf("%02x ", frame_header[i]);
-//			}
+			// for (int i = 0; i < 52; i++)
+			// {
+			// 	printf("%02x ", frame_header[i]);
+			// }
 
 
-//			cout<<"frame_dataLength = "<<frame_dataLength<<endl;
+			// cout<<"frame_dataLength = "<<frame_dataLength<<endl;
 
 			cout<<"\n\nframe no.           "<<target_frame_number<<endl<<endl;
-//			cout<<"\nTLV    no.           "<<frame_header_no_tlv<<endl<<endl;
+			// cout<<"\nTLV    no.           "<<frame_header_no_tlv<<endl<<endl;
 
-			for (int i = 0; i < frame_header_no_tlv; i++)
-			{
-				for (int i = 0; i < 8; i++)
-				{
+			for (int i = 0; i < frame_header_no_tlv; i++){
+				for (int j = 0; j < 8; j++){
 					while(fd.available() <= 0);
 					uint8_t temp_byte;
 					fd.read(&temp_byte, 1);
-					tlv_header[i] = temp_byte;
-//					printf("%02x ", tlv_header[i]);
+					tlv_header[j] = temp_byte;
+					// printf("%02x ", tlv_header[i]);
 				}
 				
 
-				if (tlv_header_type != tlv_header_type_pointCloud && tlv_header_type != tlv_header_type_targetObjectList && tlv_header_type != tlv_header_type_targetIndex)
-					{
+				if (tlv_header_type != tlv_header_type_pointCloud && tlv_header_type != tlv_header_type_targetObjectList && tlv_header_type != tlv_header_type_targetIndex){
 						printf("Header is wrong...............................!!!!!!!!!!!!!!!!!!!!!");
-//						for (int i = 0; i < 7; i++)
-//						{
-//							tlv_header[i] = tlv_header[i+1];
-//						}
-//						uint8_t temp_byte;
-//						fd.read(&temp_byte, 1);
-//						tlv_header[7] = temp_byte;
+						// for (int i = 0; i < 7; i++)
+						// {
+						// 	tlv_header[i] = tlv_header[i+1];
+						// }
+						// uint8_t temp_byte;
+						// fd.read(&temp_byte, 1);
+						// tlv_header[7] = temp_byte;
 
-						for (int i = 0; i < 8; i++)
-						{
+						for (int j = 0; j < 8; j++){
 							printf("%02x ", tlv_header[i]);
 						}
 						printf("\n");
 					}
 
 
-				if (tlv_header_type == tlv_header_type_pointCloud)
-				{
-//					printf("TLV header point cloud found\n\n");
+				if (tlv_header_type == tlv_header_type_pointCloud){
+					// printf("TLV header point cloud found\n\n");
 					tlv_dataLength = tlv_header_length - 8;
-//					cout<<endl<<tlv_dataLength<<endl;
+					// cout<<endl<<tlv_dataLength<<endl;
 					int no_of_pc = tlv_dataLength/16;
-//					printf("%d\n", no_of_pc);
+					// printf("%d\n", no_of_pc);
 
-					for (int i = 0; i < tlv_dataLength; i++)
-					{
+					for (int j = 0; j < tlv_dataLength; j++){
 						while(fd.available() <= 0);
 						uint8_t temp_byte;
 						fd.read(&temp_byte, 1);
 					}
 				}
 
-				else if (tlv_header_type == tlv_header_type_targetObjectList)
-				{
-//					printf("TLV header object list found\n\n");
+				else if (tlv_header_type == tlv_header_type_targetObjectList){
+					// printf("TLV header object list found\n\n");
 					tlv_dataLength = tlv_header_length - 8;
 
 					int no_of_objects = tlv_dataLength/68;
@@ -259,14 +241,10 @@ int main(int argc, char *argv[])
 					if(no_of_objects > 10)
 						continue;
 
-//					printf("%d\n", no_of_objects);
+					// printf("%d\n", no_of_objects);
 
-					
-
-					for (int i = 0; i < no_of_objects; i++)
-					{
-						for (int j = 0; j < 68; j++)
-						{
+					for (int k = 0; k < no_of_objects; k++){
+						for (int j = 0; j < 68; j++){
 							while(fd.available() <= 0);
 							uint8_t temp_byte;
 							fd.read(&temp_byte, 1);
@@ -275,59 +253,41 @@ int main(int argc, char *argv[])
 						
 
 						object_list_index[i] = tlv_data_targetObjectList_trackID;
-						object_list[i][0] = tlv_data_targetObjectList_posX;
-						object_list[i][1] = tlv_data_targetObjectList_posY;
-						object_list[i][2] = tlv_data_targetObjectList_velX;
-						object_list[i][3] = tlv_data_targetObjectList_velY;
-						object_list[i][4] = tlv_data_targetObjectList_accX;
-						object_list[i][5] = tlv_data_targetObjectList_accY;
-						
-//						cout<<"target no.          "<<tlv_data_targetObjectList_trackID<<endl;
-//						printf("target no.   %02x \n", tlv_data_targetObjectList_trackID);
-//						cout<<"position     X      "<<tlv_data_targetObjectList_posX<<endl;
-//						cout<<"position     Y      "<<tlv_data_targetObjectList_posY<<endl;
-//						cout<<"velocity     X      "<<tlv_data_targetObjectList_velX<<endl;
-//						cout<<"velocity     Y      "<<tlv_data_targetObjectList_velY<<endl;
-//						cout<<"acceleration X      "<<tlv_data_targetObjectList_accX<<endl;
-//						cout<<"acceleration Y      "<<tlv_data_targetObjectList_accY<<endl<<endl;
-
-						
+						object_list[k][0] = tlv_data_targetObjectList_posX;
+						object_list[k][1] = tlv_data_targetObjectList_posY;
+						object_list[k][2] = tlv_data_targetObjectList_velX;
+						object_list[k][3] = tlv_data_targetObjectList_velY;
+						object_list[k][4] = tlv_data_targetObjectList_accX;
+						object_list[k][5] = tlv_data_targetObjectList_accY;
+											
 					}
 
 					int found_last_track_ID = 0;
 					int last_track_ID_index;
 
-					for (int i = 0; i < no_of_objects; i++)
-					{
-						if (last_track_ID == object_list_index[i])
-						{
+					for (int i = 0; i < no_of_objects; i++){
+						if (last_track_ID == object_list_index[i]){
 							found_last_track_ID = 1;
 							last_track_ID_index = i;
 							break;
 						}
 					}
 
-					if (found_last_track_ID == 0)
-					{
-						for (int i = 0; i < no_of_objects; i++)
-						{
+					if (found_last_track_ID == 0){
+						for (int i = 0; i < no_of_objects; i++){
 							object_list_range[i] = object_list[i][0] * object_list[i][0] + object_list[i][1]*object_list[i][1];
 						}
 
 						//sorting of object_list_range
 
 						int object_list_index_counter[no_of_objects];
-						for (int i = 0; i < no_of_objects; i++)
-						{
+						for (int i = 0; i < no_of_objects; i++){
 							object_list_index_counter[i] = i;
 						}
 
-						for(int i = 0; i<no_of_objects-1;i++)
-						{
-							for(int j = 0; j<no_of_objects-i-1; j++)
-							{
-								if(object_list_range[j] > object_list_range[j+1])
-								{
+						for(int i = 0; i<no_of_objects-1;i++){
+							for(int j = 0; j<no_of_objects-i-1; j++){
+								if(object_list_range[j] > object_list_range[j+1]){
 									double temp_range = object_list_range[j];
 									object_list_range[j] = object_list_range[j+1];
 									object_list_range[j+1] = temp_range;
@@ -349,12 +309,20 @@ int main(int argc, char *argv[])
 
                     printf("x = %lf ", object_list[last_track_ID_index][0]);
                     printf("   y = %lf \n", object_list[last_track_ID_index][1]);
-					posMsg.header.stamp = ros::Time::now();
-					posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-					posMsg.point.x = object_list[last_track_ID_index][0];
-					posMsg.point.y = object_list[last_track_ID_index][1];
-					posMsg.point.z = object_list_index[last_track_ID_index];
-					posPub.publish(posMsg);
+					poseCorMsg.header.stamp = ros::Time::now();
+					poseCorMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+					poseCorMsg.pose.pose.position.x = object_list[last_track_ID_index][0];
+					poseCorMsg.pose.pose.position.y = object_list[last_track_ID_index][1];
+					poseCorMsg.pose.pose.position.z = 0;//object_list_index[last_track_ID_index];
+                    poseCorMsg.pose.covariance = {0};
+                    poseCorMsg.pose.covariance[0] = object_list[last_track_ID_index][4];
+                    poseCorMsg.pose.covariance[7] = object_list[last_track_ID_index][5];
+
+                    poseCorMsg.pose.pose.orientation.x = q.x();
+                    poseCorMsg.pose.pose.orientation.y = q.y();
+                    poseCorMsg.pose.pose.orientation.z = q.z();
+                    poseCorMsg.pose.pose.orientation.w = q.w();
+					posPub.publish(poseCorMsg);
 
 
                     //kalman filter
@@ -363,100 +331,92 @@ int main(int argc, char *argv[])
 
 
 
-                    for (int l = 0; l < 8; l++)
-                    {
-                        posMsg.header.stamp = ros::Time::now();
-                        posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-                        posMsg.point.x = object_list[l][0];
-                        posMsg.point.y = object_list[l][1];
-                        posMsg.point.z = object_list_index[l];
+                    for (int l = 0; l < no_of_objects; l++){
+                        poseCorMsg.header.stamp = ros::Time::now();
+                        poseCorMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+                        poseCorMsg.pose.pose.position.x = object_list[l][0];
+                        poseCorMsg.pose.pose.position.y = object_list[l][1];
+                        poseCorMsg.pose.pose.position.z = 0;//object_list_index[l];
+                        poseCorMsg.pose.covariance = {0};
+                        poseCorMsg.pose.covariance[0] = object_list[l][4];
+                        poseCorMsg.pose.covariance[7] = object_list[l][5];
 
                         switch(l){
-                            case 0: pos0Pub.publish(posMsg);
-
-                            case 1: pos1Pub.publish(posMsg);
-
-                            case 2: pos2Pub.publish(posMsg);
-
-                            case 3: pos3Pub.publish(posMsg);
-
-                            case 4: pos4Pub.publish(posMsg);
-
-                            case 5: pos5Pub.publish(posMsg);
-
-                            case 6: pos6Pub.publish(posMsg);
-
-                            case 7: pos7Pub.publish(posMsg);
+                            case 0: pos0Pub.publish(poseCorMsg);
+                            case 1: pos1Pub.publish(poseCorMsg);
+                            case 2: pos2Pub.publish(poseCorMsg);
+                            case 3: pos3Pub.publish(poseCorMsg);
+                            case 4: pos4Pub.publish(poseCorMsg);
+                            case 5: pos5Pub.publish(poseCorMsg);
+                            case 6: pos6Pub.publish(poseCorMsg);
+                            case 7: pos7Pub.publish(poseCorMsg);
                         }
                         
                     }
 
 
-                    posMsg.header.stamp = ros::Time::now();
-                    posMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
-                    posMsg.point.x = 0;
-                    posMsg.point.y = 0;
-                    posMsg.point.z = 0;
+                    poseCorMsg.header.stamp = ros::Time::now();
+                    poseCorMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+                    poseCorMsg.pose.pose.position.x = 0;
+                    poseCorMsg.pose.pose.position.y = 0;
+                    poseCorMsg.pose.pose.position.z = 0;
 
-                    switch(last_track_ID_index){
-                        case 0: pos0Pub.publish(posMsg);
+                    // switch(last_track_ID_index){    
+                    //     case 0: pos0Pub.publish(poseCorMsg);
 
-                        case 1: pos1Pub.publish(posMsg);
+                    //     case 1: pos1Pub.publish(poseCorMsg);
 
-                        case 2: pos2Pub.publish(posMsg);
+                    //     case 2: pos2Pub.publish(poseCorMsg);
 
-                        case 3: pos3Pub.publish(posMsg);
+                    //     case 3: pos3Pub.publish(poseCorMsg);
 
-                        case 4: pos4Pub.publish(posMsg);
+                    //     case 4: pos4Pub.publish(poseCorMsg);
 
-                        case 5: pos5Pub.publish(posMsg);
+                    //     case 5: pos5Pub.publish(poseCorMsg);
 
-                        case 6: pos6Pub.publish(posMsg);
+                    //     case 6: pos6Pub.publish(poseCorMsg);
 
-                        case 7: pos7Pub.publish(posMsg);
-                    }
+                    //     case 7: pos7Pub.publish(poseCorMsg);
+                    // }
 
-                    if (no_of_objects < 8)
-                    {
-                        for (int l = no_of_objects; l < 8; l++)
-                        {
-                            switch(l){
-                                case 0: pos0Pub.publish(posMsg);
+                    // if (no_of_objects < 8)   //publish 0
+                    // {
+                    //     for (int l = no_of_objects; l < 8; l++)
+                    //     {
+                    //         switch(l){
+                    //             case 0: pos0Pub.publish(poseCorMsg);
 
-                                case 1: pos1Pub.publish(posMsg);
+                    //             case 1: pos1Pub.publish(poseCorMsg);
 
-                                case 2: pos2Pub.publish(posMsg);
+                    //             case 2: pos2Pub.publish(poseCorMsg);
 
-                                case 3: pos3Pub.publish(posMsg);
+                    //             case 3: pos3Pub.publish(poseCorMsg);
 
-                                case 4: pos4Pub.publish(posMsg);
+                    //             case 4: pos4Pub.publish(poseCorMsg);
 
-                                case 5: pos5Pub.publish(posMsg);
+                    //             case 5: pos5Pub.publish(poseCorMsg);
 
-                                case 6: pos6Pub.publish(posMsg);
+                    //             case 6: pos6Pub.publish(poseCorMsg);
 
-                                case 7: pos7Pub.publish(posMsg);
-                            }
+                    //             case 7: pos7Pub.publish(poseCorMsg);
+                    //         }
                             
-                        }
-                    }
+                    //     }
+                    // }
 				
 				}
 
-				else if (tlv_header_type == tlv_header_type_targetIndex)
-				{
-//					printf("TLV header target index found\n\n");
+				else if (tlv_header_type == tlv_header_type_targetIndex){
+					// printf("TLV header target index found\n\n");
 					tlv_dataLength = tlv_header_length - 8;
 
-					for (int i = 0; i < tlv_dataLength; i++)
-					{
+					for (int i = 0; i < tlv_dataLength; i++){
 						while(fd.available() <= 0);
 						uint8_t temp_byte;
 						fd.read(&temp_byte, 1);
 					}
 				}
-				else
-				{
+				else{
 					cout<<"TLV header wrong, lost sync at frame = "<<target_frame_number<<endl<<endl;
 					lostsync = 1;				
 				}
@@ -493,7 +453,6 @@ void sendConfig()
     string lineread;
     string readline;
     int counter = 0;
-//  ifstream myfile("/home/pzx/drones/src/serial_ti_radar/src/mmw_pplcount_demo_0.cfg");
     ifstream myfile(filePath.data());
 
     if (myfile.is_open()) 

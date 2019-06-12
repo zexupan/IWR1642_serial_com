@@ -6,9 +6,9 @@ This repo provides a serial communication driver for TI IWR1642 mmWave sensor. T
 This repo was tested in Ubuntu 16.04 and ROS kinetic.
 To get it working, the TI IWR1642 has to be installed with the people counting demo firmware (tested using the firmware provided in mmwave_industrial_toolbox_2_3_0 lab0011-pplcount).
 
-serial_ti_radar_config.cpp send the cfg command to the radar
+serial_ti_radar_config.cpp sends the cfg command to the radar
 
-serial_ti_radar_read.cpp extracts the radar info
+serial_ti_radar_read.cpp sends config params, extracts the radar info and publish them as PosewithCovariance messages
 
 frame_transformation.cpp UAV track and pursuit target in autonomous offboard mode
 
@@ -42,4 +42,4 @@ roslaunch serial_ti_radar serial_ti_radar_read.launch
 
 Detailed Documentation
 ---------------------------
-WIP
+Relevant documents about how to setup people counting demo using IWR1642 sensor are in the doc folder.

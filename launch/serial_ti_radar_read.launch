@@ -4,6 +4,11 @@
     <node pkg="serial_ti_radar" name="serial_ti_radar_read" type="serial_ti_radar_read" output="screen">
 	    <param name="serialPort" type="string" value="/dev/ttyACM1" />
 	    <param name="serialPortConfig" type="string" value="/dev/ttyACM0" />
-	    <param name="filePath" type="string" value="/home/uav/catkin_ws/src/serial_ti_radar/src/mmw_pplcount_demo_0.cfg" />	    
+	    <param name="filePath" type="string" value='/home/ntudemo2/catkin_ws_waypoint/src/serial_ti_radar/src/mmw_pplcount_demo_0.cfg' />	    
     </node>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find serial_ti_radar)/rviz.rviz"/>
+
+	<node pkg="tf" type="static_transform_publisher" name="mmwave_1642" 
+	  args="0.03 -5.33 0.0 0.0 0.0 0.0 /world /base_radar_link 40" />
 </launch>

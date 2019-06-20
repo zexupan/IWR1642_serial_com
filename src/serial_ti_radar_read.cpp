@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
                     printf("x = %lf ", object_list[last_track_ID_index][0]);
                     printf("   y = %lf \n", object_list[last_track_ID_index][1]);
 					poseCorMsg.header.stamp = ros::Time::now();
-					poseCorMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+					poseCorMsg.header.frame_id = "base_radar_link";//tlv_data_targetObjectList_trackID;
 					poseCorMsg.pose.pose.position.x = object_list[last_track_ID_index][0];
 					poseCorMsg.pose.pose.position.y = object_list[last_track_ID_index][1];
 					poseCorMsg.pose.pose.position.z = 0;//object_list_index[last_track_ID_index];
@@ -333,7 +333,7 @@ int main(int argc, char *argv[])
 
                     for (int l = 0; l < no_of_objects; l++){
                         poseCorMsg.header.stamp = ros::Time::now();
-                        poseCorMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+                        poseCorMsg.header.frame_id = "base_radar_link";//tlv_data_targetObjectList_trackID;
                         poseCorMsg.pose.pose.position.x = object_list[l][0];
                         poseCorMsg.pose.pose.position.y = object_list[l][1];
                         poseCorMsg.pose.pose.position.z = 0;//object_list_index[l];
@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
 
 
                     poseCorMsg.header.stamp = ros::Time::now();
-                    poseCorMsg.header.frame_id = '1';//tlv_data_targetObjectList_trackID;
+                    poseCorMsg.header.frame_id = "base_radar_link";//tlv_data_targetObjectList_trackID;
                     poseCorMsg.pose.pose.position.x = 0;
                     poseCorMsg.pose.pose.position.y = 0;
                     poseCorMsg.pose.pose.position.z = 0;
